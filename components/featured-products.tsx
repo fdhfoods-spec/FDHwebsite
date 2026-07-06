@@ -92,7 +92,7 @@ export function FeaturedProducts() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.22, ease: 'easeOut' }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
           {filteredProducts.map((product) => {
             const inCart = items.some((i) => i.id === product.id)
@@ -103,7 +103,7 @@ export function FeaturedProducts() {
             return (
               <div
                 key={product.id}
-                className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_-15px_rgba(15,61,46,0.08)] hover:border-primary/10 transition-all duration-300 flex flex-col h-full"
+                className="group bg-white rounded-[20px] overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 flex flex-col h-full relative"
               >
                 {/* Image wrapper */}
                 <div className="relative aspect-[4/3] bg-muted overflow-hidden">
@@ -112,8 +112,8 @@ export function FeaturedProducts() {
                       src={product.image}
                       alt={product.name}
                       fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                     />
                   ) : (
                     <div className="absolute inset-0 bg-slate-100 flex items-center justify-center text-slate-300">
@@ -128,22 +128,29 @@ export function FeaturedProducts() {
                     </div>
                   )}
                   {discount > 0 && (
-                    <div className="absolute top-4 right-4 bg-secondary text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
+                    <div className="absolute top-4 left-4 bg-secondary text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
                       {discount}% OFF
                     </div>
                   )}
+
+                  {/* Heart / Favorite Indicator */}
+                  <button className="absolute top-4 right-4 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-sm text-foreground/40 hover:text-red-500 hover:bg-white transition-all duration-200">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
                 </div>
 
                 {/* Info Card */}
-                <div className="p-6 md:p-8 flex flex-col flex-grow">
+                <div className="p-5 flex flex-col flex-grow">
                   
-                  {/* Rating & Reviews */}
-                  <div className="flex items-center gap-2 mb-3">
+                  {/* Rating & Vendor */}
+                  <div className="flex items-center justify-between mb-2">
                     <div className="flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`w-3.5 h-3.5 ${
+                          className={`w-3 h-3 ${
                             i < Math.floor(product.rating)
                               ? 'fill-amber-400 text-amber-400'
                               : 'text-gray-200'
@@ -151,22 +158,19 @@ export function FeaturedProducts() {
                         />
                       ))}
                     </div>
-                    <span className="text-xs font-bold text-foreground">
-                      {product.rating}
-                    </span>
-                    <span className="text-[10px] text-foreground/40 font-medium">
-                      ({product.reviews} reviews)
+                    <span className="text-[10px] text-foreground/40 font-semibold uppercase tracking-wider">
+                      FDH Verified Vendor
                     </span>
                   </div>
 
                   {/* Product Name */}
-                  <h3 className="font-sans font-bold text-lg text-primary mb-1 group-hover:text-secondary transition-colors duration-200">
+                  <h3 className="font-sans font-bold text-base text-primary mb-1 group-hover:text-secondary transition-colors duration-200 leading-tight">
                     {product.name}
                   </h3>
                   
                   {/* Weight & Packaging details */}
-                  <div className="flex items-center gap-1.5 mb-6 text-foreground/60 text-xs font-medium">
-                    <span>Net weight: {product.weight}</span>
+                  <div className="flex items-center gap-1.5 mb-5 text-foreground/60 text-[11px] font-medium mt-1">
+                    <span>{product.weight}</span>
                     <span className="w-1 h-1 rounded-full bg-gray-300" />
                     <span className="flex items-center gap-0.5 text-secondary">
                       <Info className="w-3 h-3" /> Vacuum Sealed
@@ -174,23 +178,20 @@ export function FeaturedProducts() {
                   </div>
 
                   {/* Price and Cart Action */}
-                  <div className="mt-auto pt-6 border-t border-gray-100 flex items-center justify-between gap-4">
+                  <div className="mt-auto flex items-center justify-between gap-2">
                     
                     {/* Price column */}
                     <div className="flex flex-col">
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-xl font-extrabold text-primary">
+                        <span className="text-lg font-extrabold text-primary">
                           ₹{product.price}
                         </span>
                         {product.originalPrice > product.price && (
-                          <span className="text-xs text-foreground/40 line-through">
+                          <span className="text-[11px] text-foreground/40 line-through">
                             ₹{product.originalPrice}
                           </span>
                         )}
                       </div>
-                      <span className="text-[9px] text-foreground/40 leading-none">
-                        All taxes included
-                      </span>
                     </div>
 
                     {/* Cart CTA */}
@@ -204,22 +205,16 @@ export function FeaturedProducts() {
                           image: product.image,
                         })
                       }
-                      className={`font-semibold text-xs tracking-wider uppercase px-4 py-5 rounded-lg flex-1 flex items-center justify-center gap-1.5 shadow-sm transition-all duration-300 ${
+                      className={`font-semibold text-xs tracking-wider uppercase px-4 py-2 h-10 rounded-full flex items-center justify-center shadow-sm transition-all duration-300 ${
                         inCart
                           ? 'bg-secondary hover:bg-secondary text-white'
-                          : 'bg-primary hover:bg-primary/95 text-white'
+                          : 'bg-primary hover:bg-primary/95 text-white hover:scale-105'
                       }`}
                     >
                       {inCart ? (
-                        <>
-                          <Check className="w-4 h-4" />
-                          Added
-                        </>
+                        <Check className="w-4 h-4" />
                       ) : (
-                        <>
-                          <ShoppingCart className="w-4 h-4" />
-                          Add To Cart
-                        </>
+                        <span>Add</span>
                       )}
                     </Button>
                   </div>

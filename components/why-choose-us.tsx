@@ -18,28 +18,34 @@ export function WhyChooseUs() {
 
   const highlights = [
     {
-      icon: Sparkles,
-      title: '100% Fresh Products',
-      description: 'Sourced daily from farm to door under absolute 0-4°C cold-chain maintenance. Hand-selected, portion-cut, and delivered chilled—never frozen.',
-      color: 'bg-orange-500/10 text-orange-600',
-    },
-    {
       icon: ShieldCheck,
-      title: 'Hygienic Processing',
-      description: 'Prepared under strict pharmaceutical-grade conditions. UV sanitized, RO washed, and double vacuum-sealed by certified masters.',
-      color: 'bg-red-500/10 text-red-600',
+      title: 'Verified Vendors',
+      description: 'We partner directly with trusted farms to ensure premium quality sourcing.',
     },
     {
       icon: Clock,
       title: 'Scheduled Delivery',
-      description: 'Book precise temperature-insulated slots up to 7 days in advance. Real-time fleet tracking ensures fresh, on-time arrivals.',
-      color: 'bg-orange-600/10 text-orange-700',
+      description: 'Book precise temperature-insulated slots up to 7 days in advance.',
+    },
+    {
+      icon: Sparkles,
+      title: 'Farm Fresh Quality',
+      description: 'Sourced daily from farm to door under absolute 0-4°C cold-chain maintenance.',
     },
     {
       icon: Award,
-      title: 'Premium Quality Assurance',
-      description: '100% traceable pasture-raised meats. Lab tested for hormone residues, chemical inputs, heavy metals, and antibiotic-free standards.',
-      color: 'bg-red-600/10 text-red-700',
+      title: 'Quality Guarantee',
+      description: '100% traceable pasture-raised meats. Lab tested for hormone residues.',
+    },
+    {
+      icon: CheckCircle,
+      title: 'Food Safety First',
+      description: 'Prepared under strict pharmaceutical-grade conditions. UV sanitized and RO washed.',
+    },
+    {
+      icon: ShieldAlert,
+      title: 'Support Local',
+      description: 'Empowering local farmers and ensuring sustainable, ethical agricultural practices.',
     },
   ]
 
@@ -96,20 +102,20 @@ export function WhyChooseUs() {
             The FDH Standard
           </span>
           <h2 className="text-3xl md:text-4xl font-sans font-bold text-primary tracking-tight">
-            Why Discerning Kitchens Choose FDH
+            Why Choose FDH?
           </h2>
           <p className="mt-4 text-foreground/70 text-base md:text-lg leading-relaxed">
             We don’t compromise on details. Experience pharmaceutical-grade processing, rigorous lab testing, and uncompromised freshness.
           </p>
         </div>
 
-        {/* 4 Core Highlights Grid */}
+        {/* 6 Core Highlights Grid (3x2) */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20"
         >
           {highlights.map((item, idx) => {
             const Icon = item.icon
@@ -117,18 +123,22 @@ export function WhyChooseUs() {
               <motion.div
                 key={idx}
                 variants={itemVariants}
-                whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                className="bg-muted/30 border border-gray-100 rounded-2xl p-6 hover:shadow-lg hover:border-primary/10 transition-all duration-300 flex flex-col items-start"
+                className="group bg-muted/30 border border-gray-100 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 flex flex-col items-start relative overflow-hidden"
               >
-                <div className={`w-12 h-12 rounded-xl ${item.color} flex items-center justify-center mb-5`}>
-                  <Icon className="w-6 h-6" />
+                {/* Background Gradient on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                
+                <div className="relative z-10">
+                  <div className={`w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-sm font-extrabold text-primary mb-2 uppercase tracking-wide">
+                    {item.title}
+                  </h3>
+                  <p className="text-foreground/75 text-xs leading-relaxed">
+                    {item.description}
+                  </p>
                 </div>
-                <h3 className="text-sm font-extrabold text-primary mb-2 uppercase tracking-wide">
-                  {item.title}
-                </h3>
-                <p className="text-foreground/75 text-xs leading-relaxed">
-                  {item.description}
-                </p>
               </motion.div>
             )
           })}

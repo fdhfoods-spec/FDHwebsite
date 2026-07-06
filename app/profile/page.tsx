@@ -32,32 +32,55 @@ export default function UserProfilePage() {
   const [activeTab, setActiveTab] = useState<'orders' | 'profile' | 'addresses'>('orders')
 
   const [addresses, setAddresses] = useState<any[]>([])
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   
   useEffect(() => {
     if (user?.phone) {
-      supabase.from('users').select('address').eq('phone', user.phone).single().then(({ data }) => {
-        if (data?.address) {
-          try {
-            const parsed = JSON.parse(data.address)
-            if (Array.isArray(parsed)) {
-              setAddresses(parsed)
+      fetch(`/api/user/address?phone=${encodeURIComponent(user.phone)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.address) {
+            try {
+              const parsed = typeof data.address === 'string' ? JSON.parse(data.address) : data.address
+              if (Array.isArray(parsed)) {
+                setAddresses(parsed)
+              }
+            } catch (e) {
+              console.error('Failed to parse addresses', e)
             }
-          } catch (e) {
-            console.error('Failed to parse addresses', e)
           }
-        }
-      })
+        })
+        .catch(e => console.error('Failed to fetch addresses', e))
     }
   }, [user])
 
   const saveAddressesToDb = async (newAddresses: any[]) => {
-    setAddresses(newAddresses)
-    if (user?.phone) {
-      try {
-        await supabase.from('users').update({ address: JSON.stringify(newAddresses) }).eq('phone', user.phone)
-      } catch (e) {
-        console.error('Failed to save to database', e)
+    if (!user?.phone) return
+    if (isSaving) return
+
+    setIsSaving(true)
+    setSaveError(null)
+
+    try {
+      const response = await fetch('/api/user/address', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: user.phone, addresses: newAddresses })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save address')
       }
+
+      setAddresses(newAddresses)
+    } catch (e: any) {
+      console.error('Failed to save to database', e)
+      setSaveError(e.message || 'Failed to save address. Please try again.')
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -323,6 +346,11 @@ export default function UserProfilePage() {
                 >
                   <div>
                     <label className="text-[10px] font-bold text-foreground/50 uppercase block mb-1">Full Address</label>
+                    {saveError && (
+                      <div className="mb-2 text-[10px] font-bold text-red-500 bg-red-500/10 p-2 rounded-lg">
+                        {saveError}
+                      </div>
+                    )}
                     <textarea 
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none focus:border-secondary min-h-[80px]" 
                       value={formState.details}
@@ -332,6 +360,7 @@ export default function UserProfilePage() {
                   </div>
                   <div className="flex items-center gap-3 pt-2">
                     <button 
+                      disabled={isSaving}
                       onClick={() => {
                         if (editingId === 'new') {
                           const newId = addresses.length > 0 ? Math.max(...addresses.map(a => a.id)) + 1 : 1
@@ -346,11 +375,13 @@ export default function UserProfilePage() {
                             a.id === editingId ? { ...a, details: formState.details } : a
                           ))
                         }
-                        setEditingId(null)
+                        // Don't close immediately if saving, handled implicitly or could wait
+                        // but to keep it snappy we can let it be handled by state logic or just close it after
+                        if (!isSaving) setEditingId(null)
                       }}
-                      className="px-5 py-2.5 bg-secondary text-white text-xs font-bold rounded-xl shadow-lg shadow-secondary/20 hover:bg-secondary/90 transition-colors"
+                      className="px-5 py-2.5 bg-secondary text-white text-xs font-bold rounded-xl shadow-lg shadow-secondary/20 hover:bg-secondary/90 transition-colors disabled:opacity-50"
                     >
-                      Save
+                      {isSaving ? 'Saving...' : 'Save'}
                     </button>
                     <button 
                       onClick={() => setEditingId(null)}

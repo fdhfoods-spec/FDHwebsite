@@ -8,6 +8,7 @@ import { Offers } from '@/components/offers'
 import { WhyChooseUs } from '@/components/why-choose-us'
 import { ProcessSection } from '@/components/process'
 import { MobileApp } from '@/components/mobile-app'
+import { Pricing } from '@/components/pricing'
 import { Footer } from '@/components/footer'
 import { AuthModal } from '@/components/auth-modal'
 
@@ -26,6 +27,7 @@ export default function Home() {
         <ProcessSection />
         <TrustSection />
         <MobileApp />
+        <Pricing />
       </main>
       <Footer />
       <AuthModal />

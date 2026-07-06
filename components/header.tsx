@@ -280,8 +280,8 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const scrollToTop = (e: React.MouseEvent) => {
-    e.preventDefault()
+  const scrollToTop = (e?: React.MouseEvent) => {
+    e?.preventDefault()
     window.scrollTo({ top: 0, behavior: 'smooth' })
     setIsMenuOpen(false)
   }
@@ -311,26 +311,41 @@ export function Header() {
         setCustPhone((prev) => prev || user.name.replace(/\D/g, '') || '')
       }
       
-      if (isSupabaseConfigured() && supabase && user.phone) {
-        supabase.from('users').select('address').eq('phone', user.phone).single().then(({ data }) => {
-          if (data?.address) {
-            try {
-              const parsed = JSON.parse(data.address)
-              if (Array.isArray(parsed)) {
-                setSavedAddresses(parsed)
-                if (parsed.length > 0 && !custAddress) {
-                  const defaultAddr = parsed.find(a => a.isDefault) || parsed[0]
-                  setCustAddress(defaultAddr.details)
+      if (user.phone) {
+        fetch(`/api/user/address?phone=${encodeURIComponent(user.phone)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data?.address) {
+              try {
+                const parsed = typeof data.address === 'string' ? JSON.parse(data.address) : data.address
+                if (Array.isArray(parsed)) {
+                  setSavedAddresses(parsed)
+                  if (parsed.length > 0) {
+                    const defaultAddr = parsed.find(a => a.isDefault) || parsed[0]
+                    const currentLoc = useStore.getState().selectedLocation
+                    if (!currentLoc || currentLoc === 'Select Location' || currentLoc === '') {
+                      setSelectedLocation(defaultAddr.title || defaultAddr.details || 'Saved Address')
+                    }
+
+                    // If address is empty OR matches an existing saved address (meaning they haven't typed a custom one), update it to the default
+                    setCustAddress(prev => {
+                      if (!prev || parsed.some(a => a.details === prev)) {
+                        return defaultAddr.details
+                      }
+                      return prev
+                    })
+                  }
                 }
+              } catch (e) {
+                console.error('Failed to parse checkout addresses', e)
               }
-            } catch (e) {
-              console.error('Failed to parse checkout addresses', e)
             }
-          }
-        })
+          })
+          .catch(e => console.error('Failed to fetch checkout addresses', e))
       }
     }
-  }, [user, isCartOpen])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isCartOpen, isLocationOpen])
 
   // Auto-open checkout cart if returning from auth redirect
   useEffect(() => {
@@ -670,13 +685,14 @@ export function Header() {
   ]
 
   return (
-    <motion.header
-      initial={{ y: -50, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+    <>
+      <motion.header
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className={`sticky top-0 z-50 transition-colors duration-300 ${isScrolled
-          ? 'bg-white border-b border-gray-100 shadow-sm'
-          : 'bg-white border-b border-transparent'
+          ? 'bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm'
+          : 'bg-white/95 backdrop-blur-md border-b border-transparent'
         }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -707,7 +723,7 @@ export function Header() {
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-full hover:bg-gray-50 border border-gray-100 text-xs font-semibold text-foreground/80 hover:text-primary transition-all duration-200"
               >
                 <MapPin className="w-3.5 h-3.5 text-secondary" />
-                <span>{selectedLocation}</span>
+                <span>{String(selectedLocation || 'Location')}</span>
                 <ChevronDown className={`w-3 h-3 text-foreground/45 transition-transform duration-200 ${isLocationOpen ? 'rotate-180' : ''}`} />
               </button>
 
@@ -767,10 +783,37 @@ export function Header() {
                       </div>
                     ) : !selectedState ? (
                       <>
+                        {savedAddresses.length > 0 && (
+                          <div className="mb-2">
+                            <p className="px-4 py-1 text-[8px] uppercase font-bold text-foreground/40 tracking-wider">
+                              Saved Addresses
+                            </p>
+                            <div className="mt-1 max-h-32 overflow-y-auto border-b border-gray-100 pb-2">
+                              {savedAddresses.map((addr, idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={() => {
+                                    setSelectedLocation(addr.title)
+                                    setIsLocationOpen(false)
+                                    setLocationSearchQuery('')
+                                    setSelectedState(null)
+                                  }}
+                                  className={`w-full text-left px-4 py-2 text-xs font-semibold hover:bg-primary/5 hover:text-primary transition-all duration-200 flex flex-col gap-0.5 ${selectedLocation === addr.title ? 'text-primary bg-primary/5' : 'text-foreground/70'}`}
+                                >
+                                  <span className="flex items-center gap-1.5">
+                                    {addr.title}
+                                    {addr.isDefault && <span className="text-[8px] bg-secondary/10 text-secondary px-1.5 py-0.5 rounded uppercase font-bold leading-none">Default</span>}
+                                  </span>
+                                  <span className="text-[9px] text-foreground/40 font-medium truncate w-full">{addr.details}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         <p className="px-4 py-1 text-[8px] uppercase font-bold text-foreground/40 tracking-wider">
                           Select State
                         </p>
-                        <div className="mt-1 max-h-52 overflow-y-auto">
+                        <div className="mt-1 max-h-48 overflow-y-auto">
                           {Object.keys(LOCATIONS).map((state) => (
                             <button
                               key={state}
@@ -848,70 +891,7 @@ export function Header() {
               )}
             </div>
 
-            {/* Suggestions Panel */}
-            <AnimatePresence>
-              {isSearchPanelOpen && searchQuery.trim() !== '' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl z-50 overflow-hidden"
-                >
-                  {headerSuggestions.length === 0 ? (
-                    <div className="p-4 text-center text-foreground/45 text-xs">
-                      No matching fresh cuts found
-                    </div>
-                  ) : (
-                    <div className="p-1.5 max-h-72 overflow-y-auto space-y-1">
-                      <p className="px-2.5 py-1 text-[8px] uppercase font-extrabold text-foreground/40 tracking-wider">
-                        Suggested Fresh Cuts
-                      </p>
-                      {headerSuggestions.map((prod) => {
-                        const inCart = items.some((i) => i.id === prod.id)
-                        const hasAdded = addedAnimationItems[prod.id]
-                        return (
-                          <div
-                            key={prod.id}
-                            className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/40 transition-colors border border-transparent hover:border-gray-50"
-                          >
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="relative w-8 h-8 rounded bg-muted overflow-hidden flex-shrink-0">
-                                <Image src={prod.image} alt={prod.name} fill className="object-cover" />
-                              </div>
-                              <div className="min-w-0">
-                                <h4 className="text-[11px] font-bold text-primary leading-tight truncate">
-                                  {prod.name}
-                                </h4>
-                                <p className="text-[9px] text-foreground/45 mt-0.5 font-semibold">
-                                  {prod.weight} • {prod.category}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2.5">
-                              <span className="text-xs font-extrabold text-primary">₹{prod.price}</span>
-                              <button
-                                onClick={(e) => handleQuickAdd(prod, e)}
-                                className={`p-1.5 rounded-md transition-colors ${hasAdded || inCart
-                                    ? 'bg-secondary text-white'
-                                    : 'bg-primary hover:bg-primary/95 text-white'
-                                  }`}
-                              >
-                                {hasAdded ? (
-                                  <Check className="w-3 h-3" />
-                                ) : (
-                                  <Plus className="w-3 h-3" />
-                                )}
-                              </button>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Suggestions Panel removed as SearchOverlay takes over */}
           </div>
 
           {/* Desktop Nav Links */}
@@ -950,7 +930,7 @@ export function Header() {
                 aria-label="Select location"
               >
                 <MapPin className="w-5 h-5 text-secondary" />
-                <span className="text-[10px] font-bold hidden sm:inline">{selectedLocation.split(',')[0]}</span>
+                <span className="text-[10px] font-bold hidden sm:inline">{String(selectedLocation || 'Location').split(',')[0]}</span>
               </button>
 
               <AnimatePresence>
@@ -1005,6 +985,33 @@ export function Header() {
                       </div>
                     ) : !selectedState ? (
                       <>
+                        {savedAddresses.length > 0 && (
+                          <div className="mb-2">
+                            <p className="px-3.5 py-1 text-[8px] uppercase font-bold text-foreground/45 tracking-wider">
+                              Saved Addresses
+                            </p>
+                            <div className="mt-1 max-h-32 overflow-y-auto border-b border-gray-100 pb-2">
+                              {savedAddresses.map((addr, idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={() => {
+                                    setSelectedLocation(addr.title)
+                                    setIsLocationOpen(false)
+                                    setLocationSearchQuery('')
+                                    setSelectedState(null)
+                                  }}
+                                  className={`w-full text-left px-4 py-2 text-xs font-semibold hover:bg-primary/5 hover:text-primary transition-all flex flex-col gap-0.5 ${selectedLocation === addr.title ? 'text-primary bg-primary/5' : 'text-foreground/70'}`}
+                                >
+                                  <span className="flex items-center gap-1.5">
+                                    {addr.title}
+                                    {addr.isDefault && <span className="text-[8px] bg-secondary/10 text-secondary px-1.5 py-0.5 rounded uppercase font-bold leading-none">Default</span>}
+                                  </span>
+                                  <span className="text-[9px] text-foreground/40 font-medium truncate w-full">{addr.details}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         <p className="px-3.5 py-1 text-[8px] uppercase font-bold text-foreground/45 tracking-wider">
                           Select State
                         </p>
@@ -1242,6 +1249,7 @@ export function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+      </motion.header>
 
       {/* ── CART DRAWER ─────────────────────────────────────────────── */}
       <AnimatePresence>
@@ -1253,7 +1261,7 @@ export function Header() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={resetCartDrawer}
-              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+              className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm"
             />
 
             {/* Sliding panel */}
@@ -1262,7 +1270,7 @@ export function Header() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-white shadow-2xl flex flex-col border-l border-gray-100"
+              className="fixed top-0 right-0 bottom-0 z-[90] w-full max-w-md bg-white shadow-2xl flex flex-col border-l border-gray-100"
             >
               {/* Header */}
               <div className="p-6 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
@@ -1306,11 +1314,13 @@ export function Header() {
                         <Button
                           onClick={() => {
                             setIsCartOpen(false)
-                            if (window.location.pathname !== '/') {
-                              router.push('/#categories')
-                            } else {
-                              document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' })
-                            }
+                            setTimeout(() => {
+                              if (window.location.pathname !== '/') {
+                                router.push('/#categories')
+                              } else {
+                                document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' })
+                              }
+                            }, 150)
                           }}
                           className="mt-6 bg-primary hover:bg-primary/95 text-white text-xs font-bold uppercase tracking-wider px-6 py-2.5 rounded-lg"
                         >
@@ -2100,6 +2110,6 @@ export function Header() {
         )}
       </AnimatePresence>
       <SearchOverlay />
-    </motion.header>
+    </>
   )
 }
