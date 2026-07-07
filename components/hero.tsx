@@ -60,7 +60,7 @@ export function Hero() {
     title: 'Farm Fresh Meat Delivered To Your Doorstep',
     subtitle: 'Premium chicken, fish, mutton and ready-to-cook products prepared under strict hygiene standards and delivered chilled.',
     badge: 'FDH Signature Standard',
-    imageUrl: '/generated-banner.png',
+    imageUrl: '/generated-banner.png?v=2',
     buttonText: 'Shop Fresh',
     link: '#bestsellers',
   }

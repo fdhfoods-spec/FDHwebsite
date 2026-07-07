@@ -7,7 +7,6 @@ import { Star, ShoppingCart, Check, Info, Image as ImageIcon } from 'lucide-reac
 import { Button } from '@/components/ui/button'
 import { useStore } from '@/lib/store'
 
-
 // Products loaded dynamically from Zustand store
 
 /** Returns true only if the string is a fully-qualified, parseable URL, a valid relative path, or a base64 data URI. */
@@ -23,7 +22,7 @@ const isValidImageUrl = (src?: string | null): boolean => {
 }
 
 export function FeaturedProducts() {
-  const { addItem, items, products, activeFilter: globalFilter, setActiveFilter: setGlobalFilter } = useStore()
+  const { addItem, updateQty, removeItem, items, products, activeFilter: globalFilter, setActiveFilter: setGlobalFilter } = useStore()
   // Local UI filter — synced FROM the global store when a banner drives it
   const [activeFilter, setLocalFilter] = useState('all')
 
@@ -95,7 +94,7 @@ export function FeaturedProducts() {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
           {filteredProducts.map((product) => {
-            const inCart = items.some((i) => i.id === product.id)
+            const cartItem = items.find((i) => i.id === product.id)
             const discount = Math.round(
               ((product.originalPrice - product.price) / product.originalPrice) * 100
             )
@@ -195,28 +194,54 @@ export function FeaturedProducts() {
                     </div>
 
                     {/* Cart CTA */}
-                    <Button
-                      onClick={() =>
-                        addItem({
-                          id: product.id,
-                          name: product.name,
-                          weight: product.weight,
-                          price: product.price,
-                          image: product.image,
-                        })
-                      }
-                      className={`font-semibold text-xs tracking-wider uppercase px-4 py-2 h-10 rounded-full flex items-center justify-center shadow-sm transition-all duration-300 ${
-                        inCart
-                          ? 'bg-secondary hover:bg-secondary text-white'
-                          : 'bg-primary hover:bg-primary/95 text-white hover:scale-105'
-                      }`}
-                    >
-                      {inCart ? (
-                        <Check className="w-4 h-4" />
-                      ) : (
+                    {cartItem ? (
+                      <div className="flex items-center justify-between w-[100px] h-10 bg-primary/10 rounded-full px-2 border border-primary/20">
+                        <button
+                          onClick={() => {
+                            if (cartItem.qty > 1) {
+                              updateQty(product.id, cartItem.qty - 1)
+                            } else {
+                              updateQty(product.id, 0)
+                            }
+                          }}
+                          className="w-7 h-7 flex items-center justify-center text-primary bg-white rounded-full hover:bg-primary/20 shadow-sm transition-colors font-bold text-lg leading-none pb-0.5"
+                        >
+                          −
+                        </button>
+                        <span className="text-sm font-bold text-primary text-center">
+                          {cartItem.qty}
+                        </span>
+                        <button
+                          onClick={() => updateQty(product.id, cartItem.qty + 1)}
+                          className="w-7 h-7 flex items-center justify-center text-primary bg-white rounded-full hover:bg-primary/20 shadow-sm transition-colors font-bold text-lg leading-none pb-0.5"
+                        >
+                          +
+                        </button>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={() => {
+                          addItem({
+                            id: product.id,
+                            name: product.name,
+                            weight: product.weight,
+                            price: product.price,
+                            image: product.image,
+                          })
+                          
+                          // Programmatically click the cart button in the header
+                          // to open the Cart Details drawer
+                          const cartIcon = document.querySelector('.lucide-shopping-cart');
+                          if (cartIcon) {
+                            const btn = cartIcon.closest('button');
+                            if (btn) btn.click();
+                          }
+                        }}
+                        className="font-semibold text-xs tracking-wider uppercase px-4 py-2 h-10 rounded-full flex items-center justify-center shadow-sm transition-all duration-300 bg-primary hover:bg-primary/95 text-white hover:scale-105"
+                      >
                         <span>Add</span>
-                      )}
-                    </Button>
+                      </Button>
+                    )}
                   </div>
 
                 </div>

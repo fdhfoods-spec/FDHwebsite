@@ -27,11 +27,7 @@ export function WhyChooseUs() {
       title: 'Scheduled Delivery',
       description: 'Book precise temperature-insulated slots up to 7 days in advance.',
     },
-    {
-      icon: Sparkles,
-      title: 'Farm Fresh Quality',
-      description: 'Sourced daily from farm to door under absolute 0-4°C cold-chain maintenance.',
-    },
+
     {
       icon: Award,
       title: 'Quality Guarantee',
@@ -115,7 +111,7 @@ export function WhyChooseUs() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {highlights.map((item, idx) => {
             const Icon = item.icon
@@ -143,68 +139,6 @@ export function WhyChooseUs() {
             )
           })}
         </motion.div>
-
-        {/* Side-by-Side Comparison Container */}
-        <div className="border border-gray-100 rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
-          {/* Header Row */}
-          <div className="grid grid-cols-1 md:grid-cols-12 bg-primary text-white text-center font-sans py-6 font-bold tracking-wide border-b border-gray-200">
-            <div className="hidden md:block md:col-span-3 text-left pl-8 uppercase text-xs tracking-widest text-white/70">
-              Parameter
-            </div>
-            <div className="col-span-12 md:col-span-4 flex items-center justify-center gap-2 text-sm uppercase tracking-wider text-orange-200">
-              <CheckCircle className="w-5 h-5 text-orange-400" /> FDH Standard
-            </div>
-            <div className="hidden md:flex md:col-span-1" />
-            <div className="col-span-12 md:col-span-4 mt-2 md:mt-0 flex items-center justify-center gap-2 text-sm uppercase tracking-wider text-red-200">
-              <ShieldAlert className="w-5 h-5 text-red-400" /> Ordinary Meat Shops
-            </div>
-          </div>
-
-          {/* Table Body */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-100px' }}
-            className="divide-y divide-gray-100 bg-white"
-          >
-            {comparisonData.map((row, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                className="grid grid-cols-1 md:grid-cols-12 items-center p-6 md:py-8 md:px-8 hover:bg-muted/30 transition-colors duration-150"
-              >
-                {/* Parameter (Mobile title) */}
-                <div className="col-span-12 md:col-span-3 font-sans font-bold text-base md:text-sm text-primary mb-4 md:mb-0 uppercase tracking-wider">
-                  {row.parameter}
-                </div>
-
-                {/* FDH standard */}
-                <div className="col-span-12 md:col-span-4 flex items-start gap-3 bg-orange-50/20 md:bg-transparent p-4 md:p-0 rounded-2xl border border-orange-50/50 md:border-transparent">
-                  <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0 text-orange-700 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span className="text-sm font-semibold text-primary leading-relaxed">
-                    {row.fdh}
-                  </span>
-                </div>
-
-                {/* Gap spacer for desktop */}
-                <div className="hidden md:block md:col-span-1" />
-
-                {/* Ordinary meat shops */}
-                <div className="col-span-12 md:col-span-4 flex items-start gap-3 mt-4 md:mt-0 bg-red-50/20 md:bg-transparent p-4 md:p-0 rounded-2xl border border-red-50/30 md:border-transparent">
-                  <div className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0 text-red-600 mt-0.5">
-                    <X className="w-3.5 h-3.5" />
-                  </div>
-                  <span className="text-sm font-medium text-foreground/60 leading-relaxed">
-                    {row.ordinary}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
 
       </div>
     </section>

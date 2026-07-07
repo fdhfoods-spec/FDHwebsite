@@ -250,28 +250,24 @@ export function Header() {
 
   // Lock body scroll when drawer is open
   useEffect(() => {
-    if (isCartOpen || isMenuOpen) {
-      const scrollY = window.scrollY
-      document.body.style.overflow = 'hidden'
-      document.body.style.position = 'fixed'
-      document.body.style.top = `-${scrollY}px`
-      document.body.style.width = '100%'
-    } else {
-      const scrollY = document.body.style.top
-      document.body.style.overflow = ''
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1)
-      }
-    }
+    if (!isCartOpen && !isMenuOpen) return;
+
+    const scrollY = window.scrollY;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+
     return () => {
-      document.body.style.overflow = ''
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-    }
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      // Use setTimeout to ensure the layout has settled before restoring scroll
+      setTimeout(() => {
+        window.scrollTo(0, scrollY);
+      }, 0);
+    };
   }, [isCartOpen, isMenuOpen])
 
   useEffect(() => {
@@ -1260,8 +1256,7 @@ export function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={resetCartDrawer}
-              className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 z-[80] pointer-events-none"
             />
 
             {/* Sliding panel */}

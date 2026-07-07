@@ -1,12 +1,10 @@
 import { Suspense } from 'react'
 import { Header } from '@/components/header'
 import { Hero } from '@/components/hero'
-import { TrustSection } from '@/components/trust'
 import { Categories } from '@/components/categories'
 import { FeaturedProducts } from '@/components/featured-products'
-import { Offers } from '@/components/offers'
 import { WhyChooseUs } from '@/components/why-choose-us'
-import { ProcessSection } from '@/components/process'
+import { HowItWorks } from '@/components/how-it-works'
 import { MobileApp } from '@/components/mobile-app'
 import { Pricing } from '@/components/pricing'
 import { Footer } from '@/components/footer'
@@ -22,10 +20,8 @@ export default function Home() {
         <Hero />
         <Categories />
         <FeaturedProducts />
-        <Offers />
         <WhyChooseUs />
-        <ProcessSection />
-        <TrustSection />
+        <HowItWorks />
         <MobileApp />
         <Pricing />
       </main>
