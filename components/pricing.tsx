@@ -284,34 +284,74 @@ export function Pricing() {
 
         {/* MEAL PLANS SECTION */}
         <div className="mb-24">
-          <div className="text-center mb-10">
-            <h3 className="text-2xl md:text-3xl font-sans font-bold text-primary">Curated Meal Plans</h3>
-            <p className="text-foreground/70 mt-2">Premium boxes designed for your lifestyle.</p>
+          <div className="text-center mb-12">
+            <h3 className="text-2xl md:text-3xl font-sans font-bold text-primary">Curated Lifestyle Plans</h3>
+            <p className="text-foreground/70 mt-2">Premium boxes designed for exactly how you eat.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {[
-              { title: 'Chicken Lover', subtitle: 'Every Week', price: '₹1,499/month', items: ['2kg Chicken', '1kg Boneless', 'Eggs', 'Marinated Chicken'], icon: Box },
-              { title: 'Seafood Plan', subtitle: 'Every Friday', price: '₹2,199/month', items: ['Fish', 'Prawns', 'Crab'], icon: Box },
-              { title: 'Protein Pack', subtitle: 'Perfect for gym customers', price: '₹2,999/month', items: ['Chicken Breast', 'Egg Whites', 'Lean Fish'], icon: Box },
-              { title: 'Family Plan', subtitle: 'Mixed products', price: '₹3,499/month', items: ['Chicken', 'Fish', 'Mutton', 'Ready-to-Cook'], icon: Box },
+              { 
+                title: 'Fitness Protein Plan', 
+                subtitle: 'Ideal for athletes & gym-goers', 
+                price: '₹2,999/mo',
+                serves: '1-2 People',
+                benefits: ['High Protein', 'Lean Cuts', 'Zero Prep'],
+                items: ['Chicken Breast', 'Egg Whites', 'Lean Fish Steaks'], 
+                image: 'https://images.unsplash.com/photo-1543362906-acfc16c67564?w=500&auto=format&fit=crop&q=60' 
+              },
+              { 
+                title: 'Family Weekly Box', 
+                subtitle: 'Perfect for a family of four', 
+                price: '₹3,499/mo',
+                serves: '4 People',
+                benefits: ['Kid Friendly', 'Versatile Cuts', 'Value Combo'],
+                items: ['Boneless Chicken', 'Fresh Catch', 'Ready-to-Cook Snacks'], 
+                image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=500&auto=format&fit=crop&q=60' 
+              },
+              { 
+                title: 'Seafood Fridays', 
+                subtitle: 'For the coastal cravings', 
+                price: '₹2,199/mo',
+                serves: '2-3 People',
+                benefits: ['Omega-3 Rich', 'Daily Catch', 'Exotic Cuts'],
+                items: ['Seer Fish Steaks', 'Tiger Prawns', 'Squid Rings'], 
+                image: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=500&auto=format&fit=crop&q=60' 
+              },
             ].map((plan, idx) => (
-              <motion.div key={idx} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }} viewport={{ once: true }} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-5">
-                  <plan.icon className="w-6 h-6" />
+              <motion.div key={idx} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }} viewport={{ once: true }} className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_45px_-15px_rgba(15,61,46,0.08)] transition-all duration-500 hover:-translate-y-1 flex flex-col">
+                <div className="relative h-48 bg-muted w-full">
+                  <img src={plan.image} alt={plan.title} className="w-full h-full object-cover" />
+                  <div className="absolute top-4 left-4 bg-white/95 backdrop-blur text-primary text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-sm">
+                    {plan.serves}
+                  </div>
                 </div>
-                <h4 className="font-bold text-xl text-primary mb-1">{plan.title}</h4>
-                <p className="text-xs text-secondary font-semibold mb-5">{plan.subtitle}</p>
-                <ul className="space-y-2 mb-8 flex-grow">
-                  {plan.items.map((item, i) => (
-                    <li key={i} className="text-sm font-medium text-foreground/70 flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-secondary" /> {item}
-                    </li>
-                  ))}
-                </ul>
-                <div className="font-extrabold text-2xl text-primary mb-4">{plan.price}</div>
-                <Button variant="outline" className="w-full rounded-xl text-sm font-bold border-gray-200 text-primary hover:bg-primary hover:text-white hover:border-primary transition-colors">
-                  Select Plan
-                </Button>
+                <div className="p-6 flex flex-col flex-grow">
+                  <h4 className="font-bold text-2xl text-primary mb-1">{plan.title}</h4>
+                  <p className="text-sm text-foreground/60 mb-5">{plan.subtitle}</p>
+                  
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {plan.benefits.map((b, i) => (
+                      <span key={i} className="bg-muted/50 text-foreground/70 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">
+                        {b}
+                      </span>
+                    ))}
+                  </div>
+
+                  <ul className="space-y-2 mb-8 flex-grow">
+                    {plan.items.map((item, i) => (
+                      <li key={i} className="text-sm font-medium text-foreground/80 flex items-center gap-2">
+                        <Check className="w-4 h-4 text-secondary shrink-0" /> {item}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="flex items-center justify-between mt-auto">
+                    <div className="font-extrabold text-2xl text-primary">{plan.price}</div>
+                    <Button className="rounded-xl text-sm font-bold bg-primary hover:bg-primary/95 text-white transition-colors">
+                      Select Plan
+                    </Button>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>

@@ -1,4 +1,7 @@
+'use client'
+
 import { Clock, Store, PlusCircle, CheckCircle2, Truck } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 const steps = [
   {
@@ -34,6 +37,23 @@ const steps = [
 ]
 
 export function HowItWorks() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.15 },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: 'easeOut' },
+    },
+  }
+
   return (
     <section className="bg-[#FDFBF7] py-20 px-4 md:px-8">
       <div className="max-w-7xl mx-auto">
@@ -46,21 +66,33 @@ export function HowItWorks() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-100px' }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6"
+        >
           {steps.map((s) => (
-            <div
+            <motion.div
+              variants={itemVariants}
               key={s.step}
-              className="bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow duration-300"
+              className="bg-white p-6 rounded-3xl shadow-[0_4px_25px_-5px_rgba(0,0,0,0.02)] border border-gray-100 hover:shadow-[0_20px_45px_-15px_rgba(15,61,46,0.08)] transition-all duration-500 hover:-translate-y-1 relative"
             >
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <s.icon className="w-5 h-5 text-primary" />
+              {/* Optional connector line on desktop */}
+              {s.step < 5 && (
+                <div className="hidden lg:block absolute top-1/2 -right-3 w-6 h-[2px] bg-gradient-to-r from-primary/20 to-transparent z-0" />
+              )}
+              
+              <div className="flex items-start gap-4 relative z-10">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <s.icon className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <div className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest mb-1">
+                  <div className="text-[10px] font-bold text-secondary uppercase tracking-widest mb-1">
                     Step {s.step}
                   </div>
-                  <h3 className="font-serif font-bold text-foreground text-lg leading-snug">
+                  <h3 className="font-sans font-bold text-primary text-base leading-snug">
                     {s.title}
                   </h3>
                 </div>
@@ -68,9 +100,9 @@ export function HowItWorks() {
               <p className="mt-5 text-sm text-foreground/60 leading-relaxed font-medium">
                 {s.description}
               </p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   )

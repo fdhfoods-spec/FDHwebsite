@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Star, Quote } from 'lucide-react'
+import { Star, Quote, BadgeCheck } from 'lucide-react'
 
 export function Testimonials() {
   const reviews = [
@@ -11,6 +11,8 @@ export function Testimonials() {
       location: 'Bandra, Mumbai',
       initials: 'AD',
       rating: 5,
+      duration: 'Subscribed for 8 months',
+      favorite: 'Weekend BBQ Box',
       text: '“I am extremely particular about the meat I cook for my family. FDH is a game-changer. The vacuum-sealed packaging is immaculate, and the chicken is incredibly tender, moisture-rich, and absolutely odorless. It feels like sourcing from a high-end European butchery.”',
     },
     {
@@ -19,6 +21,8 @@ export function Testimonials() {
       location: 'Alipore, Kolkata',
       initials: 'VM',
       rating: 5,
+      duration: 'Subscribed for 2 years',
+      favorite: 'Fitness Protein Plan',
       text: '“Hygiene and source tracing are my primary concerns. Knowing that FDH performs lab audits for heavy metals and antibiotic residues gives me absolute peace of mind. The scheduled delivery slots are extremely punctual. A truly premium service.”',
     },
     {
@@ -27,6 +31,8 @@ export function Testimonials() {
       location: 'Indiranagar, Bengaluru',
       initials: 'RS',
       rating: 5,
+      duration: 'Subscribed for 1.5 years',
+      favorite: 'Seafood Fridays',
       text: '“The Seer Fish steaks are cut with surgical precision. They are fresh, sweet, and firm. I’ve ordered multiple times and the quality is consistently spectacular. You can easily taste the difference between FDH and typical local markets.”',
     },
   ]
@@ -95,9 +101,19 @@ export function Testimonials() {
               </div>
 
               {/* Testimonial Text */}
-              <p className="font-serif italic text-foreground/80 text-sm md:text-base leading-relaxed mb-8 flex-grow">
+              <p className="font-serif italic text-foreground/80 text-sm md:text-base leading-relaxed mb-6 flex-grow">
                 {review.text}
               </p>
+
+              {/* Extra Info */}
+              <div className="flex flex-col gap-1 mb-6 text-[11px] font-medium text-foreground/60">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1 h-1 rounded-full bg-secondary" /> {review.duration}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1 h-1 rounded-full bg-secondary" /> Loves: <span className="font-bold text-foreground/80">{review.favorite}</span>
+                </div>
+              </div>
 
               {/* User Bio */}
               <div className="flex items-center gap-4 pt-6 border-t border-gray-100 mt-auto">
@@ -109,8 +125,9 @@ export function Testimonials() {
                 
                 {/* Text Bio */}
                 <div className="flex flex-col">
-                  <span className="font-sans font-bold text-sm text-primary leading-tight">
+                  <span className="font-sans font-bold text-sm text-primary leading-tight flex items-center gap-1">
                     {review.name}
+                    <BadgeCheck className="w-3.5 h-3.5 text-blue-500" />
                   </span>
                   <span className="text-[10px] text-foreground/50 font-bold uppercase tracking-wider mt-0.5 leading-none">
                     {review.role}

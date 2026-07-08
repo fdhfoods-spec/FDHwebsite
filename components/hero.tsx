@@ -57,12 +57,12 @@ export function Hero() {
 
   const slide = {
     id: 1,
-    title: 'Farm Fresh Meat Delivered To Your Doorstep',
-    subtitle: 'Premium chicken, fish, mutton and ready-to-cook products prepared under strict hygiene standards and delivered chilled.',
+    title: 'Fresh Food On Your Schedule.',
+    subtitle: 'Premium quality ingredients, freshly prepared before dispatch, and delivered chilled exactly when you need them.',
     badge: 'FDH Signature Standard',
     imageUrl: '/generated-banner.png?v=2',
-    buttonText: 'Shop Fresh',
-    link: '#bestsellers',
+    buttonText: 'Start Your Weekly Plan',
+    link: '#pricing',
   }
 
   return (
@@ -87,15 +87,8 @@ export function Hero() {
 
               {/* Headline */}
               <h1 className="font-sans font-extrabold text-4xl sm:text-5xl lg:text-6xl text-primary leading-[1.15] tracking-tight mb-6">
-                {slide.title.includes(' Delivered ') ? (
-                  <>
-                    {slide.title.split(' Delivered ')[0]}<br />
-                    <span className="text-secondary font-serif font-medium italic">Delivered To Your</span><br />
-                    {slide.title.split(' Delivered ')[1] || 'Doorstep.'}
-                  </>
-                ) : (
-                  slide.title
-                )}
+                Fresh Food <br/>
+                <span className="text-secondary font-serif font-medium italic">On Your Schedule.</span>
               </h1>
 
               {/* Subheadline */}
@@ -106,23 +99,23 @@ export function Hero() {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-8">
                 <a
-                  href={slide.link}
-                  onClick={(e) => handleBannerButtonClick(e, slide.link)}
+                  href="#pricing"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }}
                   className="flex-1 sm:flex-none"
                 >
                   <Button className="w-full sm:w-auto bg-primary hover:bg-primary/95 text-white font-semibold text-base py-6 px-10 rounded-full shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
-                    Shop Now
+                    Start Your Weekly Plan
                     <span className="text-lg leading-none">→</span>
                   </Button>
                 </a>
                 <a
-                  href="#why-fdh"
+                  href="#bestsellers"
                   onClick={(e) => {
                     e.preventDefault()
-                    const element = document.getElementById('why-fdh')
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                    }
+                    document.getElementById('bestsellers')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                   }}
                   className="flex-1 sm:flex-none"
                 >
@@ -130,7 +123,7 @@ export function Hero() {
                     variant="outline"
                     className="w-full sm:w-auto border-primary text-primary font-semibold text-base py-6 px-8 rounded-full hover:bg-primary/5 transition-all duration-300"
                   >
-                    Learn More
+                    Browse Today's Fresh Collection
                   </Button>
                 </a>
               </div>
@@ -168,34 +161,47 @@ export function Hero() {
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent pointer-events-none" />
               </div>
 
-              {/* Floating Trust Badge 1 */}
-              <div className="absolute -top-6 left-4 sm:left-12 bg-white/95 backdrop-blur shadow-xl border border-gray-100 rounded-2xl p-4 flex items-center gap-3 max-w-[200px]">
-                <div className="w-10 h-10 rounded-xl bg-secondary/15 flex items-center justify-center flex-shrink-0 text-secondary">
-                  🥩
+              {/* Hero Subscription Card */}
+              <div className="absolute -bottom-6 right-4 sm:-right-4 bg-white/95 backdrop-blur shadow-2xl border border-gray-100 rounded-3xl p-6 flex flex-col gap-4 max-w-[280px] z-20">
+                <div className="flex items-center gap-3 mb-1">
+                  <div className="w-10 h-10 rounded-xl bg-secondary/15 flex items-center justify-center flex-shrink-0 text-secondary">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-primary leading-tight">
+                      Weekly Essentials
+                    </p>
+                    <p className="text-[10px] uppercase font-bold tracking-wider text-foreground/50 mt-0.5">
+                      Premium Plan
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[10px] uppercase font-bold tracking-wider text-secondary leading-none">
-                    Chilled Delivery
-                  </p>
-                  <p className="text-xs font-bold text-foreground mt-0.5 leading-tight">
-                    Always 0-4°C
-                  </p>
-                </div>
-              </div>
-
-              {/* Floating Trust Badge 2 */}
-              <div className="absolute -bottom-6 right-4 sm:right-12 bg-white/95 backdrop-blur shadow-xl border border-gray-100 rounded-2xl p-4 flex items-center gap-3 max-w-[200px]">
-                <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 text-primary">
-                  🛡️
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase font-bold tracking-wider text-primary leading-none">
-                    Hygiene Standard
-                  </p>
-                  <p className="text-xs font-bold text-foreground mt-0.5 leading-tight">
-                    WHO Compliant
-                  </p>
-                </div>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-xs font-medium text-foreground/80">
+                    <div className="w-4 h-4 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[10px] text-emerald-600 font-bold">✓</span>
+                    </div>
+                    Skip Anytime
+                  </li>
+                  <li className="flex items-center gap-2 text-xs font-medium text-foreground/80">
+                    <div className="w-4 h-4 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[10px] text-emerald-600 font-bold">✓</span>
+                    </div>
+                    Flexible Delivery Slots
+                  </li>
+                  <li className="flex items-center gap-2 text-xs font-medium text-foreground/80">
+                    <div className="w-4 h-4 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[10px] text-emerald-600 font-bold">✓</span>
+                    </div>
+                    Freshly Prepared Before Dispatch
+                  </li>
+                </ul>
+                <Button 
+                  onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  className="w-full bg-primary hover:bg-primary/95 text-white font-bold text-xs py-2 rounded-xl mt-2 transition-transform hover:scale-105"
+                >
+                  Start Subscription
+                </Button>
               </div>
 
             </div>

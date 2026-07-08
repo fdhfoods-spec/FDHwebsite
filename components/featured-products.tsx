@@ -40,12 +40,23 @@ export function FeaturedProducts() {
 
   const filters = [
     { label: 'All Fresh Today', value: 'all' },
-    { label: 'Chicken', value: 'chicken' },
-    { label: 'Mutton', value: 'mutton' },
-    { label: 'Fish & Seafood', value: 'fish' },
-    { label: 'Ready-to-Cook', value: 'ready-to-cook' },
-    { label: 'Marinated', value: 'marinated' },
+    { label: 'High Protein', value: 'chicken' },
+    { label: 'Family Favorites', value: 'mutton' },
+    { label: 'Fresh Catch', value: 'fish' },
+    { label: 'Quick Meals', value: 'ready-to-cook' },
+    { label: 'Chef Recommended', value: 'marinated' },
   ]
+
+  const getLifestyleBadge = (category: string) => {
+    switch (category) {
+      case 'chicken': return 'High Protein'
+      case 'mutton': return 'Perfect for Family'
+      case 'fish': return 'Fresh Today'
+      case 'ready-to-cook': return '15 Min Prep'
+      case 'marinated': return 'Chef Recommended'
+      default: return 'Premium Cut'
+    }
+  }
 
   const filteredProducts = activeFilter === 'all'
     ? products
@@ -102,7 +113,7 @@ export function FeaturedProducts() {
             return (
               <div
                 key={product.id}
-                className="group bg-white rounded-[20px] overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 flex flex-col h-full relative"
+                className="group bg-white rounded-3xl overflow-hidden border border-gray-100/50 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_45px_-15px_rgba(15,61,46,0.08)] transition-all duration-500 hover:-translate-y-1 flex flex-col h-full relative"
               >
                 {/* Image wrapper */}
                 <div className="relative aspect-[4/3] bg-muted overflow-hidden">
@@ -121,16 +132,9 @@ export function FeaturedProducts() {
                   )}
                   
                   {/* Floating Badges */}
-                  {product.badge && (
-                    <div className="absolute top-4 left-4 bg-white/95 backdrop-blur text-primary text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-md shadow-sm">
-                      {product.badge}
-                    </div>
-                  )}
-                  {discount > 0 && (
-                    <div className="absolute top-4 left-4 bg-secondary text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
-                      {discount}% OFF
-                    </div>
-                  )}
+                  <div className="absolute top-4 left-4 bg-white/95 backdrop-blur text-primary text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-sm">
+                    {getLifestyleBadge(product.category)}
+                  </div>
 
                   {/* Heart / Favorite Indicator */}
                   <button className="absolute top-4 right-4 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-sm text-foreground/40 hover:text-red-500 hover:bg-white transition-all duration-200">

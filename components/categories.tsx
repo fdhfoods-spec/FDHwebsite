@@ -29,40 +29,40 @@ export function Categories() {
   
   const categories = [
     {
-      id: 'chicken',
-      name: 'Chicken',
-      count: '120+ Products',
-      emoji: '🍗',
-    },
-    {
-      id: 'fish',
-      name: 'Fish & Seafood',
-      count: '85+ Products',
-      emoji: '🐟',
-    },
-    {
-      id: 'mutton',
-      name: 'Mutton',
-      count: '60+ Products',
+      id: 'protein-essentials',
+      name: 'Protein Essentials',
+      count: 'Perfect for meal prep',
       emoji: '🥩',
     },
     {
-      id: 'marinated',
-      name: 'Marinated',
-      count: '45+ Products',
-      emoji: '🍳',
+      id: 'family-chicken',
+      name: 'Family Chicken',
+      count: 'Weekly staples',
+      emoji: '🍗',
     },
     {
-      id: 'ready-to-cook',
-      name: 'Ready To Cook',
-      count: '30+ Products',
-      emoji: '🍔',
+      id: 'fresh-catch',
+      name: 'Fresh Catch',
+      count: 'Coastal favorites',
+      emoji: '🐟',
     },
     {
-      id: 'combos',
-      name: 'Combos & Extras',
-      count: '25+ Products',
-      emoji: '🍱',
+      id: 'weekend-bbq',
+      name: 'Weekend BBQ',
+      count: 'Grill ready',
+      emoji: '🔥',
+    },
+    {
+      id: 'ready-15',
+      name: 'Ready in 15 Mins',
+      count: 'Quick & easy',
+      emoji: '⏱️',
+    },
+    {
+      id: 'healthy-prep',
+      name: 'Healthy Meal Prep',
+      count: 'Lean cuts',
+      emoji: '🥗',
     },
   ]
 
@@ -119,15 +119,15 @@ export function Categories() {
             >
               <motion.div
                 variants={cardVariants}
-                className="group flex flex-col items-center justify-center p-6 bg-muted/40 border border-gray-100 rounded-[20px] transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-white cursor-pointer"
+                className="group flex flex-col items-center justify-center p-6 bg-white border border-gray-100 rounded-3xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:border-primary/20 cursor-pointer h-full"
               >
-                <div className="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-16 h-16 rounded-2xl bg-muted/40 shadow-sm flex items-center justify-center text-3xl mb-4 group-hover:scale-110 group-hover:bg-primary/5 transition-all duration-500">
                   {category.emoji}
                 </div>
-                <h3 className="font-sans font-bold text-base text-primary group-hover:text-secondary transition-colors duration-200">
+                <h3 className="font-sans font-bold text-[15px] leading-tight text-primary group-hover:text-secondary transition-colors duration-200">
                   {category.name}
                 </h3>
-                <p className="text-foreground/50 text-xs mt-1 font-semibold">
+                <p className="text-foreground/50 text-[11px] mt-1.5 font-semibold uppercase tracking-wider">
                   {category.count}
                 </p>
               </motion.div>

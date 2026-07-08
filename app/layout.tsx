@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { SupabaseInitializer } from '@/components/supabase-initializer'
+import { StructuredData } from '@/components/structured-data'
 
 export const metadata: Metadata = {
   title: 'Fresh Delivery Hub (FDH) | Premium Fresh Meat Delivery',
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   colorScheme: 'light',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#0F3D2E' },
+    { media: '(prefers-color-scheme: light)', color: '#2d2218' },
   ],
 }
 
@@ -40,6 +41,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-background scroll-smooth">
+      <head>
+        <StructuredData />
+      </head>
       <body className="font-sans antialiased bg-background text-foreground">
         <SupabaseInitializer />
         {children}

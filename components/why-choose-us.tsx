@@ -19,24 +19,28 @@ export function WhyChooseUs() {
   const highlights = [
     {
       icon: ShieldCheck,
-      title: 'Verified Vendors',
-      description: 'We partner directly with trusted farms to ensure premium quality sourcing.',
+      title: 'Trusted Local Vendors',
+      description: 'We partner directly with the finest local farms and fishermen to ensure premium quality.',
     },
     {
       icon: Clock,
-      title: 'Scheduled Delivery',
-      description: 'Book precise temperature-insulated slots up to 7 days in advance.',
+      title: 'Choose Your Window',
+      description: 'Select a precise delivery slot that fits your lifestyle. Your time is valuable.',
     },
-
     {
       icon: Award,
-      title: 'Quality Guarantee',
-      description: '100% traceable pasture-raised meats. Lab tested for hormone residues.',
+      title: 'Quality Guaranteed',
+      description: '100% traceable, premium cuts. If it doesn’t meet our standard, we replace it.',
     },
     {
       icon: CheckCircle,
-      title: 'Food Safety First',
-      description: 'Prepared under strict pharmaceutical-grade conditions. UV sanitized and RO washed.',
+      title: 'Prepared With Care',
+      description: 'Expertly cut, cleaned, and vacuum-sealed for maximum freshness and flavor.',
+    },
+    {
+      icon: Sparkles,
+      title: 'Freshly Prepared',
+      description: 'Your order is prepared just before your delivery slot—never stored overnight.',
     },
     {
       icon: ShieldAlert,
@@ -98,10 +102,10 @@ export function WhyChooseUs() {
             The FDH Standard
           </span>
           <h2 className="text-3xl md:text-4xl font-sans font-bold text-primary tracking-tight">
-            Why Choose FDH?
+            Why Families Choose FDH
           </h2>
           <p className="mt-4 text-foreground/70 text-base md:text-lg leading-relaxed">
-            We don’t compromise on details. Experience pharmaceutical-grade processing, rigorous lab testing, and uncompromised freshness.
+            We don’t just deliver food; we deliver peace of mind. Experience premium quality, flexible scheduling, and uncompromising freshness.
           </p>
         </div>
 

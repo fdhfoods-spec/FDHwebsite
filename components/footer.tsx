@@ -39,27 +39,27 @@ export function Footer() {
   }
 
   const categories = [
-    { name: 'Fresh Chicken', href: '#categories' },
-    { name: 'Fish & Seafood', href: '#categories' },
-    { name: 'Fresh Mutton', href: '#categories' },
-    { name: 'Gourmet Marinated', href: '#categories' },
-    { name: 'Ready To Cook Snacks', href: '#categories' },
+    { name: 'Protein Essentials', href: '#categories' },
+    { name: 'Family Chicken', href: '#categories' },
+    { name: 'Fresh Catch', href: '#categories' },
+    { name: 'Weekend BBQ', href: '#categories' },
+    { name: 'Ready in 15 Mins', href: '#categories' },
   ]
 
   const company = [
-    { name: 'About Us', href: '/about' },
+    { name: 'Our Story', href: '/about' },
     { name: 'Sourcing Standards', href: '#why-fdh' },
-    { name: 'Sterile Clean-rooms', href: '#why-fdh' },
+    { name: 'Delivery Coverage', href: '#' },
     { name: 'Careers', href: '#' },
     { name: 'Press & Media', href: '#' },
   ]
 
-  const support = [
-    { name: 'Track Order', href: '#' },
-    { name: 'Help Center', href: '#' },
-    { name: 'Returns & Refund Policy', href: '#' },
-    { name: 'Shipping & Slots FAQ', href: '#' },
-    { name: 'Contact Support', href: '#contact' },
+  const community = [
+    { name: 'Recipe Blog', href: '#' },
+    { name: 'Download App', href: '#' },
+    { name: 'Refer Friends', href: '#' },
+    { name: 'Future Home Chef Program', href: '#' },
+    { name: 'Become a Vendor', href: '#' },
   ]
 
   const socials = [
@@ -77,6 +77,20 @@ export function Footer() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
+        {/* Newsletter Section */}
+        <div className="mb-16 bg-primary/10 border border-primary/20 rounded-3xl p-8 md:p-12 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="max-w-md">
+            <h3 className="font-sans font-bold text-2xl text-white mb-2">Join the FDH Community</h3>
+            <p className="text-white/70 text-sm leading-relaxed">Subscribe to our newsletter for exclusive recipes, early access to new collections, and behind-the-scenes stories from our local farms.</p>
+          </div>
+          <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3">
+            <input type="email" placeholder="Your email address" className="w-full sm:w-72 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-secondary transition-colors" />
+            <button className="bg-secondary hover:bg-secondary/90 text-white font-bold px-6 py-3 rounded-xl transition-colors whitespace-nowrap">
+              Subscribe
+            </button>
+          </div>
+        </div>
+
         {/* Main Footer Links */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-zinc-800">
           
@@ -149,13 +163,13 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Support */}
+          {/* Column 4: Community */}
           <div className="col-span-12 sm:col-span-4 lg:col-span-2">
             <h4 className="font-sans font-bold text-sm text-white uppercase tracking-widest mb-6">
-              Support
+              Community
             </h4>
             <ul className="space-y-3.5 text-sm">
-              {support.map((item) => (
+              {community.map((item) => (
                 <li key={item.name}>
                   <Link href={item.href} className="hover:text-white transition-colors duration-200">
                     {item.name}

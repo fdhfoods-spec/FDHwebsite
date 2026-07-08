@@ -1,27 +1,33 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Calendar, ShieldCheck, Clock } from 'lucide-react'
+import { CalendarSync, ShieldCheck, Truck, Star } from 'lucide-react'
 
 export function TrustSection() {
   const cards = [
     {
-      icon: Calendar,
-      title: 'Fresh Daily',
-      description: 'Sourced from organic farms and coastal waters daily. Transported at 0-4°C immediately after prep, guaranteeing optimal freshness without freezing.',
-      color: 'bg-emerald-500/10 text-emerald-700',
+      icon: Star,
+      title: '4.9 Customer Rating',
+      description: 'Join thousands of families who trust us for their weekly fresh food needs. Our consistent quality speaks for itself.',
+      color: 'bg-amber-500/10 text-amber-500',
+    },
+    {
+      icon: Truck,
+      title: '0–4°C Chilled Delivery',
+      description: 'Our unbroken cold chain ensures your food arrives at peak freshness, never frozen and always safe.',
+      color: 'bg-blue-500/10 text-blue-500',
     },
     {
       icon: ShieldCheck,
-      title: 'Hygienically Processed',
-      description: 'Prepared in WHO-compliant sterile clean-rooms. UV sanitized, washed in RO purified water, and double vacuum-sealed for zero contamination.',
-      color: 'bg-primary/10 text-primary',
+      title: 'Trusted Local Vendors',
+      description: 'We partner directly with the best local farms and fishermen, ensuring traceable, premium quality in every order.',
+      color: 'bg-emerald-500/10 text-emerald-600',
     },
     {
-      icon: Clock,
-      title: 'Scheduled Delivery',
-      description: 'Pick a precise delivery slot that fits your lifestyle. Shipped in temperature-insulated bags, guaranteeing timely arrival and chilled freshness.',
-      color: 'bg-blue-500/10 text-blue-700',
+      icon: CalendarSync,
+      title: 'Flexible Subscriptions',
+      description: 'Daily, weekly, or monthly deliveries that fit your schedule. Pause, skip, or modify anytime without fees.',
+      color: 'bg-primary/10 text-primary',
     },
   ]
 
@@ -60,7 +66,7 @@ export function TrustSection() {
             The FDH Quality Covenant
           </h2>
           <p className="mt-4 text-foreground/75 text-base md:text-lg leading-relaxed">
-            We operate outside the typical quick-commerce ecosystem, focusing instead on pristine sanitation and authentic freshness.
+            We operate on a foundation of absolute transparency and premium quality, delivering fresh food on your terms.
           </p>
         </div>
 
@@ -70,7 +76,7 @@ export function TrustSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8"
         >
           {cards.map((card, idx) => {
             const Icon = card.icon
