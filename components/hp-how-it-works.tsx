@@ -1,30 +1,36 @@
-import { ShoppingCart, Package, Truck, CheckCircle } from 'lucide-react'
+import { Clock, Store, Scissors, CheckCircle, Truck } from 'lucide-react'
 
 export function HpHowItWorks() {
   const steps = [
     {
-      icon: ShoppingCart,
+      icon: Clock,
       number: 1,
-      title: 'Browse & Select',
-      description: 'Browse our selection of premium meat and add items to your cart.',
+      title: 'Choose your slot',
+      description: 'Pick a delivery window that fits your kitchen—not ours.',
     },
     {
-      icon: Package,
+      icon: Store,
       number: 2,
-      title: 'We Prepare',
-      description: 'Our expert butchers prepare and pack your order with care in temperature-controlled storage.',
+      title: 'Shop gets your order',
+      description: 'Your order is instantly assigned to the nearest trusted FDH partner.',
     },
     {
-      icon: Truck,
+      icon: Scissors,
       number: 3,
-      title: 'We Deliver',
-      description: 'Your order arrives fresh within 24 hours in insulated, temperature-controlled packaging.',
+      title: 'Cut before your slot',
+      description: 'Your meat is freshly cut and packed close to your selected delivery time.',
     },
     {
       icon: CheckCircle,
       number: 4,
-      title: 'Enjoy',
-      description: 'Prepare and enjoy the finest quality meat with confidence and peace of mind.',
+      title: 'Verified before dispatch',
+      description: 'Every order is quality checked before leaving the shop to ensure freshness.',
+    },
+    {
+      icon: Truck,
+      number: 5,
+      title: 'Delivered in your window',
+      description: 'Delivered fresh within your selected time slot—exactly when you need it.',
     },
   ]
 
@@ -34,11 +40,11 @@ export function HpHowItWorks() {
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">How It Works</h2>
           <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
-            Simple, fast, and reliable. Get fresh meat delivered to your door in 4 easy steps.
+            Freshly prepared, quality checked, and delivered within your chosen delivery slot.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-5 gap-6">
           {steps.map((step, index) => {
             const Icon = step.icon
             return (
@@ -49,7 +55,7 @@ export function HpHowItWorks() {
                 )}
 
                 {/* Card */}
-                <div className="bg-card p-6 rounded-lg border border-border relative z-10">
+                <div className="bg-card p-6 rounded-lg border border-border relative z-10 h-full">
                   <div className="flex items-center justify-center mb-4">
                     <div className="w-12 h-12 bg-secondary text-secondary-foreground rounded-full flex items-center justify-center">
                       <Icon className="w-6 h-6" />

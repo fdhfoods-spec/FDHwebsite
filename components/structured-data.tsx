@@ -31,7 +31,7 @@ export function StructuredData() {
       addressCountry: 'US',
     },
     telephone: '+1-555-0123',
-    priceRange: '$$',
+    priceRange: '₹₹',
     ratingValue: '4.9',
     ratingCount: '2400',
   }

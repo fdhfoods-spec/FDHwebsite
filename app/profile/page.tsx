@@ -34,25 +34,47 @@ export default function UserProfilePage() {
   const [addresses, setAddresses] = useState<any[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
+  const [profileName, setProfileName] = useState('')
+  const [profileEmail, setProfileEmail] = useState('')
+
+  useEffect(() => {
+    if (user) {
+      setProfileName(user.name || '')
+      setProfileEmail(user.email || '')
+    }
+  }, [user])
   
   useEffect(() => {
-    if (user?.phone) {
-      fetch(`/api/user/address?phone=${encodeURIComponent(user.phone)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.address) {
-            try {
-              const parsed = typeof data.address === 'string' ? JSON.parse(data.address) : data.address
-              if (Array.isArray(parsed)) {
-                setAddresses(parsed)
-              }
-            } catch (e) {
-              console.error('Failed to parse addresses', e)
-            }
+    const fetchAddresses = async () => {
+      if (!user?.phone) return
+      
+      let token = null
+      if (supabase) {
+        const { data: { session } } = await supabase.auth.getSession()
+        token = session?.access_token
+      }
+
+      try {
+        const res = await fetch(`/api/user/address?phone=${encodeURIComponent(user.phone)}`, {
+          headers: {
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
           }
         })
-        .catch(e => console.error('Failed to fetch addresses', e))
+        const data = await res.json()
+        if (data.address) {
+          const parsed = typeof data.address === 'string' ? JSON.parse(data.address) : data.address
+          if (Array.isArray(parsed)) {
+            setAddresses(parsed)
+          }
+        }
+      } catch (e) {
+        console.error('Failed to fetch addresses', e)
+      }
     }
+
+    fetchAddresses()
   }, [user])
 
   const saveAddressesToDb = async (newAddresses: any[]) => {
@@ -61,11 +83,21 @@ export default function UserProfilePage() {
 
     setIsSaving(true)
     setSaveError(null)
+    setSaveSuccess(false)
 
     try {
+      let token = null
+      if (supabase) {
+        const { data: { session } } = await supabase.auth.getSession()
+        token = session?.access_token
+      }
+
       const response = await fetch('/api/user/address', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ phone: user.phone, addresses: newAddresses })
       })
 
@@ -75,7 +107,14 @@ export default function UserProfilePage() {
         throw new Error(data.error || 'Failed to save address')
       }
 
-      setAddresses(newAddresses)
+      if (data.addresses && Array.isArray(data.addresses)) {
+        setAddresses(data.addresses)
+      } else {
+        setAddresses(newAddresses)
+      }
+      setSaveSuccess(true)
+      setEditingId(null)
+      setTimeout(() => setSaveSuccess(false), 4000)
     } catch (e: any) {
       console.error('Failed to save to database', e)
       setSaveError(e.message || 'Failed to save address. Please try again.')
@@ -309,19 +348,65 @@ export default function UserProfilePage() {
 
         {activeTab === 'profile' && (
           <div className="bg-white border border-gray-100 rounded-3xl p-6 space-y-4">
-            <h2 className="text-foreground uppercase tracking-wider">Account Information</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-foreground uppercase tracking-wider">Account Information</h2>
+              {!isEditingProfile ? (
+                <button 
+                  onClick={() => setIsEditingProfile(true)}
+                  className="px-4 py-2 bg-secondary text-white text-xs font-bold rounded-xl hover:bg-secondary/90 transition-colors shadow-lg shadow-secondary/20"
+                >
+                  Edit
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => {
+                      if (user) {
+                        setUser({ ...user, name: profileName, email: profileEmail })
+                      }
+                      setIsEditingProfile(false)
+                    }}
+                    className="px-4 py-2 bg-secondary text-white text-xs font-bold rounded-xl hover:bg-secondary/90 transition-colors shadow-lg shadow-secondary/20"
+                  >
+                    Save
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setProfileName(user?.name || '')
+                      setProfileEmail(user?.email || '')
+                      setIsEditingProfile(false)
+                    }}
+                    className="px-4 py-2 bg-white border border-gray-200 text-foreground text-xs font-bold rounded-xl hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
-                <span className="text-[10px] font-bold text-foreground/50 uppercase block mb-1">Full Name</span>
-                <span className="text-foreground font-bold text-sm">{user?.name || 'Customer'}</span>
+                <label className="text-[10px] font-bold text-foreground/50 uppercase block mb-1">Full Name</label>
+                <input 
+                  type="text"
+                  readOnly={!isEditingProfile}
+                  value={profileName}
+                  onChange={(e) => setProfileName(e.target.value)}
+                  className={`w-full bg-transparent font-bold text-sm text-foreground outline-none ${isEditingProfile ? 'border-b border-gray-300 pb-1' : ''}`}
+                />
               </div>
               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
                 <span className="text-[10px] font-bold text-foreground/50 uppercase block mb-1">Phone Number</span>
                 <span className="text-foreground font-bold text-sm">{user?.phone || '+91 98765 43210'}</span>
               </div>
               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
-                <span className="text-[10px] font-bold text-foreground/50 uppercase block mb-1">Email Address</span>
-                <span className="text-foreground font-bold text-sm">{user?.email || 'customer@fdh.com'}</span>
+                <label className="text-[10px] font-bold text-foreground/50 uppercase block mb-1">Email (Optional)</label>
+                <input 
+                  type="email"
+                  readOnly={!isEditingProfile}
+                  value={profileEmail}
+                  onChange={(e) => setProfileEmail(e.target.value)}
+                  className={`w-full bg-transparent font-bold text-sm text-foreground outline-none ${isEditingProfile ? 'border-b border-gray-300 pb-1' : ''}`}
+                />
               </div>
               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
                 <span className="text-[10px] font-bold text-foreground/50 uppercase block mb-1">Membership Status</span>
@@ -334,6 +419,13 @@ export default function UserProfilePage() {
         {activeTab === 'addresses' && (
           <div className="bg-white border border-gray-100 rounded-3xl p-6 space-y-4 overflow-hidden">
             <h2 className="text-foreground uppercase tracking-wider">Saved Addresses</h2>
+            
+            {saveSuccess && (
+              <div className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/20 flex items-center gap-1.5 animate-fadeIn">
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                Address saved successfully!
+              </div>
+            )}
             
             <AnimatePresence mode="wait">
               {editingId !== null ? (
@@ -362,12 +454,16 @@ export default function UserProfilePage() {
                     <button 
                       disabled={isSaving}
                       onClick={() => {
+                        if (!formState.details || !formState.details.trim()) {
+                          setSaveError('Address details cannot be empty.')
+                          return
+                        }
                         if (editingId === 'new') {
                           const newId = addresses.length > 0 ? Math.max(...addresses.map(a => a.id)) + 1 : 1
                           saveAddressesToDb([...addresses, {
                             id: newId,
                             title: `Address ${newId}`,
-                            details: formState.details || 'No address provided',
+                            details: formState.details,
                             isDefault: addresses.length === 0
                           }])
                         } else {
@@ -375,9 +471,6 @@ export default function UserProfilePage() {
                             a.id === editingId ? { ...a, details: formState.details } : a
                           ))
                         }
-                        // Don't close immediately if saving, handled implicitly or could wait
-                        // but to keep it snappy we can let it be handled by state logic or just close it after
-                        if (!isSaving) setEditingId(null)
                       }}
                       className="px-5 py-2.5 bg-secondary text-white text-xs font-bold rounded-xl shadow-lg shadow-secondary/20 hover:bg-secondary/90 transition-colors disabled:opacity-50"
                     >

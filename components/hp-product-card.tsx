@@ -1,9 +1,9 @@
 import Image from 'next/image'
-import { Star } from 'lucide-react'
-import Link from 'next/link'
+import { Star, Minus, Plus } from 'lucide-react'
+import { useStore } from '@/lib/store'
 
 interface HpProductCardProps {
-  id: string
+  id: string | number
   name: string
   category: string
   price: number
@@ -23,6 +23,41 @@ export function HpProductCard({
   reviews,
   badge,
 }: HpProductCardProps) {
+  const { items, addItem, updateQty, removeItem, setIsCartOpen, setCartStep } = useStore()
+
+  const cartItem = items.find((item) => item.id === Number(id))
+
+  const handleAddToCart = () => {
+    addItem({
+      id: Number(id),
+      name,
+      category,
+      price,
+      image,
+      rating,
+      reviews,
+      badge,
+    })
+    setIsCartOpen(true)
+    setCartStep('cart')
+  }
+
+  const handleIncreaseCartQty = () => {
+    if (cartItem) {
+      updateQty(Number(id), cartItem.qty + 1)
+    }
+  }
+
+  const handleDecreaseCartQty = () => {
+    if (cartItem) {
+      if (cartItem.qty <= 1) {
+        removeItem(Number(id))
+      } else {
+        updateQty(Number(id), cartItem.qty - 1)
+      }
+    }
+  }
+
   return (
     <div className="bg-card rounded-lg border border-border hover:border-secondary transition-all hover:shadow-lg overflow-hidden group">
       {/* Image Container */}
@@ -66,13 +101,31 @@ export function HpProductCard({
 
         {/* Price and Button */}
         <div className="flex items-center justify-between">
-          <span className="text-lg font-bold text-primary">${price}</span>
-          <Link
-            href={`/product/${id}`}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded text-sm font-medium hover:bg-primary/90 transition-colors"
-          >
-            Add
-          </Link>
+          <span className="text-lg font-bold text-primary">₹{price}</span>
+          {cartItem ? (
+            <div className="flex items-center border border-border rounded bg-card overflow-hidden shadow-sm">
+              <button
+                onClick={handleDecreaseCartQty}
+                className="p-1.5 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+              >
+                <Minus className="w-3.5 h-3.5" />
+              </button>
+              <span className="px-2.5 text-xs font-bold text-primary">{cartItem.qty}</span>
+              <button
+                onClick={handleIncreaseCartQty}
+                className="p-1.5 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded text-sm font-medium hover:bg-primary/90 transition-colors"
+            >
+              Add
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -22,8 +22,7 @@ const QUICK_CATEGORIES = [
   { name: 'Chicken', slug: 'chicken', image: '/cat-chicken.png' },
   { name: 'Mutton', slug: 'mutton', image: '/cat-mutton.png' },
   { name: 'Fish & Seafood', slug: 'fish', image: '/cat-fish.png' },
-  { name: 'Ready-to-Cook', slug: 'ready-to-cook', image: '/cat-ready-cook.png' },
-  { name: 'Marinated', slug: 'marinated', image: '/cat-seafood.png' }
+  { name: 'Eggs', slug: 'eggs', image: '/images/eggs-category.jpg' }
 ]
 
 export function SearchOverlay() {

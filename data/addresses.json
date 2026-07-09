@@ -1,0 +1,18 @@
+{
+  "+919876543210": [
+    {
+      "id": "54e2ad11-e0cc-4877-a7aa-03d15db5a8b4",
+      "title": "Address 1",
+      "details": "Pocket C-2, Vasant Kunj, New Delhi - 110070",
+      "isDefault": true
+    }
+  ],
+  "+919080238438": [
+    {
+      "id": "952fe8a7-216f-404d-a6d8-fe6a2a170f56",
+      "title": "Address 1",
+      "details": "krishnagriri",
+      "isDefault": true
+    }
+  ]
+}

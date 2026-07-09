@@ -5,7 +5,6 @@ import { HpTrustSection } from '@/components/hp-trust-section'
 import { HpProductsSection } from '@/components/hp-products-section'
 import { HpHowItWorks } from '@/components/hp-how-it-works'
 import { HpQualitySection } from '@/components/hp-quality-section'
-import { HpReviewsSection } from '@/components/hp-reviews-section'
 import { HpDeliverySection } from '@/components/hp-delivery-section'
 import { HpFAQSection } from '@/components/hp-faq-section'
 import { HpFooter } from '@/components/hp-footer'
@@ -23,7 +22,6 @@ export default function Home() {
         <HpProductsSection />
         <HpHowItWorks />
         <HpQualitySection />
-        <HpReviewsSection />
         <HpDeliverySection />
         <HpFAQSection />
       </main>

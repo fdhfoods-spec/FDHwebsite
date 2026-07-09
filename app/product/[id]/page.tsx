@@ -26,43 +26,75 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const productId = parseInt(resolvedParams.id, 10)
   const router = useRouter()
 
-  const { products, addItem, wishlist, toggleWishlist, reviews, addReview, fetchReviews, user } = useStore()
+  const {
+    products,
+    addItem,
+    items,
+    updateQty,
+    removeItem,
+    wishlist,
+    toggleWishlist,
+    reviews,
+    addReview,
+    fetchReviews,
+    fetchProducts,
+    user
+  } = useStore()
 
-  const product = products.find((p) => p.id === productId) || products[0]
+  const product = products.find((p) => p.id === productId)
   const isBookmarked = wishlist.includes(productId)
 
+  const cartItem = items.find((item) => item.id === productId)
+
   const [selectedWeight, setSelectedWeight] = useState('500g')
-  const [quantity, setQuantity] = useState(1)
   const [reviewerName, setReviewerName] = useState(user?.name || '')
   const [ratingInput, setRatingInput] = useState(5)
   const [commentInput, setCommentInput] = useState('')
   const [showReviewSuccess, setShowReviewSuccess] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (productId) {
       fetchReviews(productId)
     }
-  }, [productId, fetchReviews])
+    fetchProducts().finally(() => {
+      setIsLoading(false)
+    })
+  }, [productId, fetchReviews, fetchProducts])
 
   const productReviews = reviews.filter((r) => r.productId === productId)
 
   const handleAddToCart = () => {
     if (!product) return
-    for (let i = 0; i < quantity; i++) {
-      addItem({
-        id: product.id,
-        name: product.name,
-        category: product.category,
-        weight: selectedWeight,
-        price: selectedWeight === '1kg' ? Math.round(product.price * 1.8) : product.price,
-        originalPrice: product.originalPrice,
-        rating: product.rating,
-        reviews: product.reviews,
-        badge: product.badge,
-        image: product.image,
-        vendorId: product.vendorId,
-        vendorName: product.vendorName
-      })
+    addItem({
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      weight: selectedWeight,
+      price: selectedWeight === '1kg' ? Math.round(product.price * 1.8) : product.price,
+      originalPrice: product.originalPrice,
+      rating: product.rating,
+      reviews: product.reviews,
+      badge: product.badge,
+      image: product.image,
+      vendorId: product.vendorId,
+      vendorName: product.vendorName
+    })
+  }
+
+  const handleIncreaseCartQty = () => {
+    if (cartItem) {
+      updateQty(productId, cartItem.qty + 1)
+    }
+  }
+
+  const handleDecreaseCartQty = () => {
+    if (cartItem) {
+      if (cartItem.qty <= 1) {
+        removeItem(productId)
+      } else {
+        updateQty(productId, cartItem.qty - 1)
+      }
     }
   }
 
@@ -78,6 +110,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     setCommentInput('')
     setShowReviewSuccess(true)
     setTimeout(() => setShowReviewSuccess(false), 3000)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-secondary mx-auto"></div>
+          <p className="text-xs text-slate-400">Loading product details...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!product) {
@@ -195,28 +238,30 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
             {/* Quantity & Add to Cart */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
-              <div className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl p-1.5 w-36">
+              {cartItem ? (
+                <div className="w-full sm:w-48 h-[48px] flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl p-1 px-4">
+                  <button
+                    onClick={handleDecreaseCartQty}
+                    className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="font-mono font-extrabold text-white text-sm">{cartItem.qty}</span>
+                  <button
+                    onClick={handleIncreaseCartQty}
+                    className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
                 <button
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                  onClick={handleAddToCart}
+                  className="w-full sm:w-48 py-3.5 bg-secondary hover:bg-secondary/90 text-white font-black rounded-xl text-xs uppercase tracking-wider transition-all shadow-xl shadow-secondary/25 flex items-center justify-center gap-2"
                 >
-                  <Minus className="w-4 h-4" />
+                  <ShoppingBag className="w-4 h-4" /> Add To Fresh Cart
                 </button>
-                <span className="font-mono font-bold text-white text-sm">{quantity}</span>
-                <button
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-
-              <button
-                onClick={handleAddToCart}
-                className="flex-1 py-3.5 bg-secondary hover:bg-secondary/90 text-white font-black rounded-xl text-xs uppercase tracking-wider transition-all shadow-xl shadow-secondary/25 flex items-center justify-center gap-2"
-              >
-                <ShoppingBag className="w-4 h-4" /> Add To Fresh Cart
-              </button>
+              )}
             </div>
 
             {/* Trust Badges */}

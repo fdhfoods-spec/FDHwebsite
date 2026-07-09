@@ -126,7 +126,7 @@ export default function AdminDashboardPage() {
 
   // Add Product modal state
   const [isAddProductOpen, setIsAddProductOpen] = useState(false)
-  const [deleteConfirmProduct, setDeleteConfirmProduct] = useState<{id: string, name: string} | null>(null)
+  const [deleteConfirmProduct, setDeleteConfirmProduct] = useState<{id: number | string, name: string} | null>(null)
   const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
     name: '',
     category: 'chicken',
@@ -168,6 +168,7 @@ export default function AdminDashboardPage() {
     updateProduct,
     addProduct,
     deleteProduct,
+    fetchProducts,
     orders,
     updateOrderStatus,
     banners,
@@ -187,6 +188,10 @@ export default function AdminDashboardPage() {
     enableWhatsappCheckout,
     updateSettings
   } = useStore()
+
+  useEffect(() => {
+    fetchProducts()
+  }, [fetchProducts])
 
 
 
@@ -1537,8 +1542,7 @@ export default function AdminDashboardPage() {
                       <option value="chicken">Chicken</option>
                       <option value="mutton">Mutton</option>
                       <option value="fish">Fish & Seafood</option>
-                      <option value="ready-to-cook">Ready to Cook</option>
-                      <option value="marinated">Marinated</option>
+                      <option value="eggs">Eggs</option>
                     </select>
                   </div>
                 </div>

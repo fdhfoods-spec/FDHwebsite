@@ -18,7 +18,7 @@ export function HpQualitySection() {
           {/* Left Image */}
           <div className="relative h-96 rounded-lg overflow-hidden">
             <Image
-              src="/images/quality-control.png"
+              src="/images/quality-new-uploaded.jpg"
               alt="Quality control and processing"
               fill
               className="object-cover"
@@ -40,13 +40,6 @@ export function HpQualitySection() {
                 </div>
               ))}
             </div>
-
-            <a
-              href="/about"
-              className="inline-flex items-center justify-center px-8 py-3 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors font-medium"
-            >
-              Learn About Our Suppliers
-            </a>
           </div>
         </div>
       </div>

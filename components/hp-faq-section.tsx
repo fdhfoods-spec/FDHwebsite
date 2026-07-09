@@ -76,7 +76,11 @@ export function HpFAQSection() {
             Our customer service team is here to help you 7 days a week.
           </p>
           <a
-            href="/about"
+            href="#footer"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('footer')?.scrollIntoView({ behavior: 'smooth' });
+            }}
             className="inline-flex items-center justify-center px-6 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors font-medium text-sm"
           >
             Contact Us

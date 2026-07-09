@@ -50,11 +50,97 @@ export function Header() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const pathname = usePathname()
+  const {
+    items,
+    removeItem,
+    updateQty,
+    clearCart,
+    totalItems,
+    subtotal,
+    selectedLocation,
+    setSelectedLocation,
+    searchQuery,
+    setSearchQuery,
+    setSearchFocused,
+    setAuthModalOpen,
+    user,
+    setUser,
+    products,
+    addOrder,
+    whatsappNumber,
+    deliveryFee: storeDeliveryFee,
+    freeDeliveryLimit,
+    enableCod,
+    enableOnline,
+    enableWhatsappCheckout,
+    wishlist = [],
+    setActiveFilter,
+    isCartOpen,
+    setIsCartOpen,
+    cartStep,
+    setCartStep,
+  } = useStore()
+
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isCartOpen, setIsCartOpen] = useState(false)
   const [isLocationOpen, setIsLocationOpen] = useState(false)
   const [isSearchPanelOpen, setIsSearchPanelOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState<string>('')
+
+  const handleScrollToSection = (sectionId: string) => {
+    const el = document.getElementById(sectionId)
+    if (el) {
+      const headerOffset = 90 // sticky header offset
+      const elementPosition = el.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (pathname !== '/') {
+      setActiveSection('')
+      return
+    }
+
+    const sections = ['products', 'why-fdh', 'how-it-works', 'quality', 'faq']
+    
+    const handleScrollActive = () => {
+      const scrollPosition = window.scrollY + 120
+
+      let currentSection = ''
+      for (const sectionId of sections) {
+        const el = document.getElementById(sectionId)
+        if (el) {
+          const top = el.offsetTop
+          const height = el.offsetHeight
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            currentSection = sectionId
+            break
+          }
+        }
+      }
+      
+      if (window.scrollY < 100) {
+        currentSection = ''
+      }
+      
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50) {
+        currentSection = 'faq'
+      }
+
+      setActiveSection(currentSection)
+    }
+
+    window.addEventListener('scroll', handleScrollActive)
+    handleScrollActive()
+
+    return () => window.removeEventListener('scroll', handleScrollActive)
+  }, [pathname])
 
   // Location selection and search states
   const [selectedState, setSelectedState] = useState<string | null>(null)
@@ -64,8 +150,7 @@ export function Header() {
   const [headerSuggestions, setHeaderSuggestions] = useState<Product[]>([])
   const [addedAnimationItems, setAddedAnimationItems] = useState<Record<number, boolean>>({})
 
-  // Cart Drawer Step Machine: 'cart' | 'checkout' | 'razorpay' | 'success'
-  const [cartStep, setCartStep] = useState<'cart' | 'checkout' | 'razorpay' | 'success'>('cart')
+  // Cart Drawer Step Machine details
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'online' | 'whatsapp'>('cod')
 
   // Checkout Form State
@@ -167,32 +252,6 @@ export function Header() {
     return () => document.removeEventListener('mousedown', handleOutsideClick)
   }, [])
 
-  const {
-    items,
-    removeItem,
-    updateQty,
-    clearCart,
-    totalItems,
-    subtotal,
-    selectedLocation,
-    setSelectedLocation,
-    searchQuery,
-    setSearchQuery,
-    setSearchFocused,
-    setAuthModalOpen,
-    user,
-    setUser,
-    products,
-    addOrder,
-    whatsappNumber,
-    deliveryFee: storeDeliveryFee,
-    freeDeliveryLimit,
-    enableCod,
-    enableOnline,
-    enableWhatsappCheckout,
-    wishlist = [],
-    setActiveFilter,
-  } = useStore()
 
   const deliveryFee = subtotal > 0 && subtotal < freeDeliveryLimit ? storeDeliveryFee : 0
   const total = subtotal + deliveryFee
@@ -308,36 +367,47 @@ export function Header() {
       }
       
       if (user.phone) {
-        fetch(`/api/user/address?phone=${encodeURIComponent(user.phone)}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data?.address) {
-              try {
-                const parsed = typeof data.address === 'string' ? JSON.parse(data.address) : data.address
-                if (Array.isArray(parsed)) {
-                  setSavedAddresses(parsed)
-                  if (parsed.length > 0) {
-                    const defaultAddr = parsed.find(a => a.isDefault) || parsed[0]
-                    const currentLoc = useStore.getState().selectedLocation
-                    if (!currentLoc || currentLoc === 'Select Location' || currentLoc === '') {
-                      setSelectedLocation(defaultAddr.title || defaultAddr.details || 'Saved Address')
-                    }
+        const fetchCheckoutAddresses = async () => {
+          let token = null
+          if (supabase) {
+            const { data: { session } } = await supabase.auth.getSession()
+            token = session?.access_token
+          }
 
-                    // If address is empty OR matches an existing saved address (meaning they haven't typed a custom one), update it to the default
-                    setCustAddress(prev => {
-                      if (!prev || parsed.some(a => a.details === prev)) {
-                        return defaultAddr.details
-                      }
-                      return prev
-                    })
+          try {
+            const res = await fetch(`/api/user/address?phone=${encodeURIComponent(user.phone)}`, {
+              headers: {
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+              }
+            })
+            const data = await res.json()
+            if (data?.address) {
+              const parsed = typeof data.address === 'string' ? JSON.parse(data.address) : data.address
+              if (Array.isArray(parsed)) {
+                setSavedAddresses(parsed)
+                if (parsed.length > 0) {
+                  const defaultAddr = parsed.find(a => a.isDefault) || parsed[0]
+                  const currentLoc = useStore.getState().selectedLocation
+                  if (!currentLoc || currentLoc === 'Select Location' || currentLoc === '') {
+                    setSelectedLocation(defaultAddr.title || defaultAddr.details || 'Saved Address')
                   }
+
+                  // If address is empty OR matches an existing saved address (meaning they haven't typed a custom one), update it to the default
+                  setCustAddress(prev => {
+                    if (!prev || parsed.some(a => a.details === prev)) {
+                      return defaultAddr.details
+                    }
+                    return prev
+                  })
                 }
-              } catch (e) {
-                console.error('Failed to parse checkout addresses', e)
               }
             }
-          })
-          .catch(e => console.error('Failed to fetch checkout addresses', e))
+          } catch (e) {
+            console.error('Failed to fetch checkout addresses', e)
+          }
+        }
+
+        fetchCheckoutAddresses()
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -634,48 +704,69 @@ export function Header() {
   }
 
   const navLinks = [
-    { name: 'Home', href: '/', onClick: (e: any) => {
-        e.preventDefault()
-        router.push('/')
-        scrollToTop()
-      }
-    },
-    { name: 'Categories', href: '/#categories', onClick: (e: any) => {
-        e.preventDefault()
-        router.push('/#categories')
-        setTimeout(() => {
-          const el = document.getElementById('categories')
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 150)
-      }
-    },
-    { name: 'Fresh Today', href: '/#bestsellers', onClick: (e: any) => {
-        e.preventDefault()
-        setActiveFilter('all')
-        router.push('/#bestsellers')
-        setTimeout(() => {
-          const el = document.getElementById('bestsellers')
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 150)
-      }
-    },
-    { name: 'About', href: '/#why-fdh', onClick: (e: any) => {
+    { 
+      name: 'Products', 
+      href: '/#products', 
+      sectionId: 'products',
+      onClick: (e: any) => {
         e.preventDefault()
         if (pathname === '/') {
-          const el = document.getElementById('why-fdh')
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          handleScrollToSection('products')
+        } else {
+          router.push('/#products')
+        }
+      }
+    },
+    { 
+      name: 'Why FDH', 
+      href: '/#why-fdh', 
+      sectionId: 'why-fdh',
+      onClick: (e: any) => {
+        e.preventDefault()
+        if (pathname === '/') {
+          handleScrollToSection('why-fdh')
         } else {
           router.push('/#why-fdh')
         }
       }
     },
-    { name: 'Contact', href: '/#contact', onClick: (e: any) => {
+    { 
+      name: 'How It Works', 
+      href: '/#how-it-works', 
+      sectionId: 'how-it-works',
+      onClick: (e: any) => {
         e.preventDefault()
-        router.push('/#contact')
-        setTimeout(() => {
-          const el = document.getElementById('contact')
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 150)
+        if (pathname === '/') {
+          handleScrollToSection('how-it-works')
+        } else {
+          router.push('/#how-it-works')
+        }
+      }
+    },
+    { 
+      name: 'Quality', 
+      href: '/#quality', 
+      sectionId: 'quality',
+      onClick: (e: any) => {
+        e.preventDefault()
+        if (pathname === '/') {
+          handleScrollToSection('quality')
+        } else {
+          router.push('/#quality')
+        }
+      }
+    },
+    { 
+      name: 'FAQ', 
+      href: '/#faq', 
+      sectionId: 'faq',
+      onClick: (e: any) => {
+        e.preventDefault()
+        if (pathname === '/') {
+          handleScrollToSection('faq')
+        } else {
+          router.push('/#faq')
+        }
       }
     },
   ]
@@ -893,13 +984,15 @@ export function Header() {
           {/* Desktop Nav Links */}
           <nav className="hidden xl:flex items-center gap-6">
             {navLinks.map((link) => {
-              const isActive = pathname === link.href
+              const isActive = pathname === '/' 
+                ? activeSection === link.sectionId
+                : pathname === link.href
               return (
                 <Link
                   key={link.name}
                   href={link.href}
                   onClick={link.onClick}
-                  className={`relative text-xs font-semibold tracking-wide transition-colors py-2 group ${
+                  className={`relative font-sans text-xs font-semibold tracking-wide transition-colors py-2 group ${
                     isActive ? 'text-primary' : 'text-foreground/80 hover:text-primary'
                   }`}
                 >
@@ -1178,7 +1271,9 @@ export function Header() {
             <div className="px-4 pt-4 pb-6 space-y-4">
               <nav className="flex flex-col gap-1">
                 {navLinks.map((link) => {
-                  const isActive = pathname === link.href
+                  const isActive = pathname === '/' 
+                    ? activeSection === link.sectionId
+                    : pathname === link.href
                   return (
                     <Link
                       key={link.name}
@@ -1187,7 +1282,7 @@ export function Header() {
                         if (link.onClick) link.onClick(e)
                         setIsMenuOpen(false)
                       }}
-                      className={`block px-4 py-3 rounded-lg font-semibold text-sm transition-colors ${
+                      className={`block px-4 py-3 rounded-lg font-sans font-semibold text-sm transition-colors ${
                         isActive 
                           ? 'bg-primary/5 text-primary' 
                           : 'text-foreground/80 hover:bg-muted/40 hover:text-primary'
@@ -1311,9 +1406,9 @@ export function Header() {
                             setIsCartOpen(false)
                             setTimeout(() => {
                               if (window.location.pathname !== '/') {
-                                router.push('/#categories')
+                                router.push('/#our-products')
                               } else {
-                                document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' })
+                                document.getElementById('our-products')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                               }
                             }, 150)
                           }}

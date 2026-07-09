@@ -4,7 +4,10 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 export const isSupabaseConfigured = () => {
-  return !!supabaseUrl && !!supabaseAnonKey && supabaseUrl !== 'YOUR_SUPABASE_URL'
+  return !!supabaseUrl && 
+         !!supabaseAnonKey && 
+         supabaseUrl !== 'YOUR_SUPABASE_URL' && 
+         !supabaseUrl.includes('fdh-supabase-project.supabase.co')
 }
 
 export const supabase = isSupabaseConfigured() 

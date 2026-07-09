@@ -1,6 +1,51 @@
+'use client'
+
 import Image from 'next/image'
 
 export function HpHero() {
+  const handleCtaClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const href = e.currentTarget.getAttribute('href') || '';
+    
+    // Determine target section
+    let targetId = 'products';
+    if (href === '/how-it-works') targetId = 'how-it-works';
+
+    const targetSection = document.getElementById(targetId);
+    if (!targetSection) return;
+    
+    // Smooth scroll to target section
+    targetSection.scrollIntoView({ behavior: 'smooth' });
+
+    if (targetId === 'products') {
+      // Read the available product category buttons from the "Our Products" section
+      const categoryButtons = Array.from(
+        document.querySelectorAll('#products button[data-category]')
+      ) as HTMLElement[];
+
+      if (categoryButtons.length > 0) {
+        const buttonText = e.currentTarget.textContent?.trim().toLowerCase() || '';
+        
+        let targetButton = categoryButtons[0];
+
+        // Ensure each banner CTA is mapped to its correct destination/category
+        for (const btn of categoryButtons) {
+          const btnText = btn.textContent?.trim().toLowerCase() || '';
+          
+          if (btnText && buttonText.includes(btnText.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '').trim())) {
+            targetButton = btn;
+            break;
+          }
+        }
+
+        // Automatically activate the correct category button after navigation
+        setTimeout(() => {
+          targetButton.click();
+        }, 500);
+      }
+    }
+  };
+
   return (
     <section className="pt-24 pb-12 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -18,12 +63,14 @@ export function HpHero() {
             <div className="flex flex-col sm:flex-row gap-4">
               <a
                 href="/products"
+                onClick={handleCtaClick}
                 className="inline-flex items-center justify-center px-8 py-3 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors font-medium"
               >
                 Shop Now
               </a>
               <a
                 href="/how-it-works"
+                onClick={handleCtaClick}
                 className="inline-flex items-center justify-center px-8 py-3 border-2 border-secondary text-secondary rounded hover:bg-secondary/10 transition-colors font-medium"
               >
                 Learn More
@@ -52,7 +99,7 @@ export function HpHero() {
           {/* Right Image */}
           <div className="relative h-96 md:h-full min-h-96 rounded-lg overflow-hidden">
             <Image
-              src="/images/hero-premium-meat.png"
+              src="/images/hero-new-uploaded.jpg"
               alt="Premium fresh meat selection"
               fill
               className="object-cover"

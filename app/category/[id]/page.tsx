@@ -14,8 +14,12 @@ import { Suspense } from 'react'
 export default function CategoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
   const categoryId = resolvedParams.id
-  const { products, addItem, items } = useStore()
+  const { products, addItem, items, fetchProducts } = useStore()
   const router = useRouter()
+
+  useEffect(() => {
+    fetchProducts()
+  }, [fetchProducts])
 
   useEffect(() => {
     if (categoryId === 'fresh-cuts') {

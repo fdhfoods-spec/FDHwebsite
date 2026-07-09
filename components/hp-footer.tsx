@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { Mail, Phone, MapPin } from 'lucide-react'
 
@@ -5,7 +7,7 @@ export function HpFooter() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer id="footer" className="bg-primary text-primary-foreground">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
@@ -31,10 +33,86 @@ export function HpFooter() {
           <div>
             <h4 className="font-bold mb-4">Shop</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/category/beef" className="hover:text-secondary transition-colors">Beef</Link></li>
-              <li><Link href="/category/chicken" className="hover:text-secondary transition-colors">Chicken</Link></li>
-              <li><Link href="/category/pork" className="hover:text-secondary transition-colors">Pork</Link></li>
-              <li><Link href="/category/seafood" className="hover:text-secondary transition-colors">Seafood</Link></li>
+              <li>
+                <a 
+                  href="#our-products" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (window.location.pathname !== '/') {
+                      window.location.href = '/#our-products';
+                    } else {
+                      document.getElementById('our-products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      setTimeout(() => {
+                        const btn = document.querySelector('#our-products button[data-category="chicken"]') as HTMLElement;
+                        if (btn) btn.click();
+                      }, 150);
+                    }
+                  }} 
+                  className="hover:text-secondary transition-colors cursor-pointer"
+                >
+                  Chicken
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#our-products" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (window.location.pathname !== '/') {
+                      window.location.href = '/#our-products';
+                    } else {
+                      document.getElementById('our-products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      setTimeout(() => {
+                        const btn = document.querySelector('#our-products button[data-category="mutton"]') as HTMLElement;
+                        if (btn) btn.click();
+                      }, 150);
+                    }
+                  }} 
+                  className="hover:text-secondary transition-colors cursor-pointer"
+                >
+                  Mutton
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#our-products" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (window.location.pathname !== '/') {
+                      window.location.href = '/#our-products';
+                    } else {
+                      document.getElementById('our-products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      setTimeout(() => {
+                        const btn = document.querySelector('#our-products button[data-category="fish-and-sea-foods"]') as HTMLElement;
+                        if (btn) btn.click();
+                      }, 150);
+                    }
+                  }} 
+                  className="hover:text-secondary transition-colors cursor-pointer"
+                >
+                  Fish & Sea Foods
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#our-products" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (window.location.pathname !== '/') {
+                      window.location.href = '/#our-products';
+                    } else {
+                      document.getElementById('our-products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      setTimeout(() => {
+                        const btn = document.querySelector('#our-products button[data-category="eggs"]') as HTMLElement;
+                        if (btn) btn.click();
+                      }, 150);
+                    }
+                  }} 
+                  className="hover:text-secondary transition-colors cursor-pointer"
+                >
+                  Eggs
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -42,9 +120,9 @@ export function HpFooter() {
           <div>
             <h4 className="font-bold mb-4">Company</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/about" className="hover:text-secondary transition-colors">About Us</Link></li>
-              <li><Link href="/about" className="hover:text-secondary transition-colors">Our Suppliers</Link></li>
-              <li><Link href="/vendor" className="hover:text-secondary transition-colors">Vendor</Link></li>
+              <li><span className="text-primary-foreground">About Us</span></li>
+              <li><span className="text-primary-foreground">Our Suppliers</span></li>
+              <li><span className="text-primary-foreground">Vendor</span></li>
               <li><Link href="/profile" className="hover:text-secondary transition-colors">My Account</Link></li>
             </ul>
           </div>
@@ -53,9 +131,9 @@ export function HpFooter() {
           <div>
             <h4 className="font-bold mb-4">Support</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/about" className="hover:text-secondary transition-colors">Contact Us</Link></li>
+              <li><span className="text-primary-foreground">Contact Us</span></li>
               <li><Link href="/how-it-works" className="hover:text-secondary transition-colors">How It Works</Link></li>
-              <li><Link href="/track" className="hover:text-secondary transition-colors">Track Order</Link></li>
+              <li><span className="text-primary-foreground">Track Order</span></li>
               <li><Link href="/profile" className="hover:text-secondary transition-colors">My Orders</Link></li>
             </ul>
           </div>
@@ -83,15 +161,15 @@ export function HpFooter() {
         <div className="border-t border-primary-foreground/20 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-primary-foreground/80">
           <p>&copy; {currentYear} Fresh Delivery Hub. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
-            <Link href="/about" className="hover:text-secondary transition-colors">
+            <span className="hover:text-secondary transition-colors cursor-default">
               Privacy Policy
-            </Link>
-            <Link href="/about" className="hover:text-secondary transition-colors">
+            </span>
+            <span className="hover:text-secondary transition-colors cursor-default">
               Terms of Service
-            </Link>
-            <Link href="/about" className="hover:text-secondary transition-colors">
+            </span>
+            <span className="hover:text-secondary transition-colors cursor-default">
               Cookie Policy
-            </Link>
+            </span>
           </div>
         </div>
       </div>

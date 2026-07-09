@@ -262,6 +262,10 @@ interface HomepageState {
   clearCart: () => void
   totalItems: number
   subtotal: number
+  isCartOpen: boolean
+  setIsCartOpen: (open: boolean) => void
+  cartStep: 'cart' | 'checkout' | 'razorpay' | 'success'
+  setCartStep: (step: 'cart' | 'checkout' | 'razorpay' | 'success') => void
 
   // Location selector state
   selectedLocation: string
@@ -1218,7 +1222,7 @@ const mapProductFromDb = (dbProduct: any): Product => {
     category === 'chicken' ? ['poultry', 'meat', 'raw'] : [],
     category === 'mutton' ? ['lamb', 'goat', 'meat', 'red meat', 'curry'] : [],
     category === 'fish' ? ['seafood', 'prawns', 'crab', 'river fish', 'sea fish'] : [],
-    category === 'marinated' ? ['spiced', 'tikka', 'kabab', 'ready to cook'] : [],
+    category === 'eggs' ? ['egg', 'poultry', 'protein', 'breakfast'] : [],
   ].flat().map(s => String(s).toLowerCase().trim()).filter(Boolean)
 
   return {
@@ -1404,7 +1408,7 @@ export const useStore = create<HomepageState>((set) => ({
       p.category === 'chicken' ? ['poultry', 'meat', 'raw'] : [],
       p.category === 'mutton' ? ['lamb', 'goat', 'meat', 'red meat', 'curry'] : [],
       p.category === 'fish' ? ['seafood', 'prawns', 'crab', 'river fish', 'sea fish'] : [],
-      p.category === 'marinated' ? ['spiced', 'tikka', 'kabab', 'ready to cook'] : [],
+      p.category === 'eggs' ? ['egg', 'poultry', 'protein', 'breakfast'] : [],
     ].flat().map(s => String(s).toLowerCase().trim()).filter(Boolean)
 
     return {
@@ -1424,17 +1428,17 @@ export const useStore = create<HomepageState>((set) => ({
   }),
   updateProduct: (productId, updatedFields) =>
     set((state) => {
-      if (isSupabaseConfigured()) {
-        fetch('/api/admin/products', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productId, updatedFields: mapProductToDb(updatedFields) })
-        }).then(res => res.json()).then(res => {
-          if (res.error) console.error('Error updating product in Supabase:', res.error)
-        }).catch(err => {
-          console.error('Network error updating product:', err)
-        })
-      }
+      fetch('/api/admin/products', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId, updatedFields }),
+        cache: 'no-store'
+      }).then(res => res.json()).then(res => {
+        if (res.error) console.error('Error updating product:', res.error)
+      }).catch(err => {
+        console.error('Network error updating product:', err)
+      })
+
       return {
         products: state.products.map((p) =>
           p.id === productId ? { ...p, ...updatedFields } : p
@@ -1443,7 +1447,7 @@ export const useStore = create<HomepageState>((set) => ({
     }),
   addProduct: (product) =>
     set((state) => {
-      const nextId = state.products.reduce((max, p) => Math.max(max, p.id), 0) + 1
+      const nextId = state.products.length > 0 ? Math.max(...state.products.map(p => p.id)) + 1 : 1
       const newProduct = { 
         ...product, 
         id: nextId, 
@@ -1451,34 +1455,41 @@ export const useStore = create<HomepageState>((set) => ({
         rating: 5,
         reviews: 0
       }
-      if (isSupabaseConfigured()) {
-        fetch('/api/admin/products', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(mapProductToDb(newProduct))
-        }).then(res => res.json()).then(res => {
-          if (res.error) console.error('Error adding product to Supabase:', res.error)
-        }).catch(err => {
-          console.error('Network error adding product:', err)
-        })
-      }
+      
+      fetch('/api/admin/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProduct),
+        cache: 'no-store'
+      }).then(res => res.json()).then(res => {
+        if (res.error) console.error('Error adding product:', res.error)
+      }).catch(err => {
+        console.error('Network error adding product:', err)
+      })
+      
       return {
         products: [...state.products, newProduct],
       }
     }),
   deleteProduct: (productId) =>
     set((state) => {
-      if (isSupabaseConfigured()) {
-        fetch(`/api/admin/products?id=${productId}`, {
-          method: 'DELETE'
-        }).then(res => res.json()).then(res => {
-          if (res.error) console.error('Error deleting product from Supabase:', res.error)
-        }).catch(err => {
-          console.error('Network error deleting product:', err)
-        })
-      }
+      console.log(`[DELETE PRODUCT FRONTEND] Attempting to delete product. ID sent from frontend:`, productId)
+      
+      fetch(`/api/admin/products?id=${productId}`, {
+        method: 'DELETE',
+        cache: 'no-store'
+      }).then(res => res.json()).then(res => {
+        if (res.error) {
+          console.error('[DELETE PRODUCT FRONTEND] Error deleting product:', res.error)
+        } else {
+          console.log('[DELETE PRODUCT FRONTEND] Successfully received success response from API:', res)
+        }
+      }).catch(err => {
+        console.error('[DELETE PRODUCT FRONTEND] Network error deleting product:', err)
+      })
+
       return {
-        products: state.products.filter((p) => p.id !== productId),
+        products: state.products.filter((p) => String(p.id) !== String(productId)),
       }
     }),
 
@@ -1636,6 +1647,10 @@ export const useStore = create<HomepageState>((set) => ({
   items: [],
   totalItems: 0,
   subtotal: 0,
+  isCartOpen: false,
+  setIsCartOpen: (open) => set({ isCartOpen: open }),
+  cartStep: 'cart',
+  setCartStep: (step) => set({ cartStep: step }),
 
   addItem: (product) =>
     set((state) => {
@@ -2202,20 +2217,23 @@ export const useStore = create<HomepageState>((set) => ({
 
   // Async Database Fetching Methods
   fetchProducts: async () => {
-    if (!isSupabaseConfigured() || !supabase) return
     try {
-      const { data, error } = await supabase.from('products').select('*').order('id', { ascending: true })
+      const res = await fetch('/api/admin/products', { cache: 'no-store' })
+      const { data, error } = await res.json()
       if (error) throw error
       if (data && data.length > 0) {
-        console.log('[Supabase Audit] Fetched products:', data.length)
-        set({ products: data.map(mapProductFromDb) })
+        set({ products: data })
       } else {
-        const dbProducts = INITIAL_PRODUCTS.map(mapProductToDb)
-        const { error: insertErr } = await supabase.from('products').insert(dbProducts)
-        if (insertErr) console.error('Error prepopulating Supabase products:', insertErr.message || insertErr.details || insertErr)
+        const dbProducts = INITIAL_PRODUCTS
+        await fetch('/api/admin/products', { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dbProducts) 
+        })
+        set({ products: dbProducts })
       }
     } catch (e: any) {
-      console.error('Failed to fetch products from Supabase:', e?.message || e?.details || e)
+      console.error('Failed to fetch products:', e?.message || e?.details || e)
     }
   },
   fetchBanners: async () => {

@@ -10,20 +10,18 @@ import { Star, ShoppingCart, Check, ArrowLeft, Eye, Sparkles } from 'lucide-reac
 import { Button } from '@/components/ui/button'
 
 export default function AllProductsPage() {
-  const { products, addItem, items } = useStore()
+  const { products, addItem, items, fetchProducts } = useStore()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Simulate dynamic/API product fetching on mount to show the skeleton loader
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!products || products.length === 0) {
-        setError('Failed to load products from database schema cache. Please check your Supabase tables.')
-      }
-      setIsLoading(false)
-    }, 400) // Fast premium transition
-    return () => clearTimeout(timer)
-  }, [products])
+    fetchProducts()
+      .then(() => setIsLoading(false))
+      .catch((err) => {
+        setError('Failed to load products from database: ' + (err.message || err))
+        setIsLoading(false)
+      })
+  }, [fetchProducts])
 
   const handleAddToCart = (product: Product) => {
     addItem({
