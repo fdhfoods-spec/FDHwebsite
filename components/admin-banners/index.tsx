@@ -55,7 +55,7 @@ const compressImage = (file: File, callback: (base64Str: string) => void) => {
 }
 
 export function BannerManagement() {
-  const { banners: rawBanners = [], addBanner, updateBanner, archiveBanner } = useStore()
+  const { banners: rawBanners = [], addBanner, updateBanner, archiveBanner, deleteBanner } = useStore()
   const banners = rawBanners || []
 
   // Create Modal State
@@ -195,6 +195,17 @@ export function BannerManagement() {
                     >
                       <Archive className="w-3.5 h-3.5" />
                     </button>
+                    <button
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to permanently delete this banner?')) {
+                          deleteBanner(banner.id)
+                        }
+                      }}
+                      className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl backdrop-blur-md border border-red-500/30 transition-all shadow-md"
+                      title="Delete Campaign"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
 
                   <div className="absolute bottom-4 left-4 right-4 space-y-1">
@@ -317,12 +328,24 @@ export function BannerManagement() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => updateBanner(banner.id, { archived: false, active: true })}
-                  className="px-3 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/20 text-xs font-bold rounded-xl transition-all shrink-0 flex items-center gap-1"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" /> Restore Slide
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => updateBanner(banner.id, { archived: false, active: true })}
+                    className="px-3 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/20 text-xs font-bold rounded-xl transition-all shrink-0 flex items-center gap-1"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" /> Restore Slide
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to permanently delete this banner?')) {
+                        deleteBanner(banner.id)
+                      }
+                    }}
+                    className="px-3 py-1.5 bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/20 text-xs font-bold rounded-xl transition-all shrink-0 flex items-center gap-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>

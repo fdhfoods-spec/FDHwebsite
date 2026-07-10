@@ -295,6 +295,7 @@ interface HomepageState {
   banners: Banner[]
   addBanner: (banner: Omit<Banner, 'id'>) => void
   updateBanner: (bannerId: number, updatedFields: Partial<Banner>) => void
+  archiveBanner: (bannerId: number) => void
   deleteBanner: (bannerId: number) => void
 
   // Delivery partner state
@@ -1766,7 +1767,7 @@ export const useStore = create<HomepageState>((set) => ({
       banners: state.banners.map((b) => b.id === bannerId ? { ...b, ...updatedFields } : b)
     }
   }),
-  deleteBanner: (bannerId) => set((state) => {
+  archiveBanner: (bannerId) => set((state) => {
     if (isSupabaseConfigured() && supabase) {
       supabase.from('banners').update({ archived: true, active: false }).eq('id', bannerId).then(({ error }) => {
         if (error) console.error('Error archiving banner in Supabase:', error)
@@ -1774,6 +1775,16 @@ export const useStore = create<HomepageState>((set) => ({
     }
     return {
       banners: state.banners.map((b) => b.id === bannerId ? { ...b, archived: true, active: false } : b)
+    }
+  }),
+  deleteBanner: (bannerId) => set((state) => {
+    if (isSupabaseConfigured() && supabase) {
+      supabase.from('banners').delete().eq('id', bannerId).then(({ error }) => {
+        if (error) console.error('Error deleting banner in Supabase:', error)
+      })
+    }
+    return {
+      banners: state.banners.filter((b) => b.id !== bannerId)
     }
   }),
 
