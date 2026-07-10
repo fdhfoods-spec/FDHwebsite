@@ -171,6 +171,7 @@ export default function AdminDashboardPage() {
     fetchProducts,
     orders,
     updateOrderStatus,
+    fetchOrders,
     banners,
     addBanner,
     updateBanner,
@@ -191,7 +192,8 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     fetchProducts()
-  }, [fetchProducts])
+    fetchOrders()
+  }, [fetchProducts, fetchOrders])
 
 
 
