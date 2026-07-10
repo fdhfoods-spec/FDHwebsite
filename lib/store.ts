@@ -45,6 +45,7 @@ export type OrderStatus =
   | 'out-for-delivery'
   | 'delivered'
   | 'cancelled'
+  | 'paid'
 
 export interface Order {
   id: string
@@ -52,12 +53,16 @@ export interface Order {
   customerPhone: string
   customerAddress: string
   items: CartItem[]
-  paymentMethod: 'cod' | 'online' | 'whatsapp'
+  paymentMethod: 'cod' | 'online' | 'whatsapp' | 'razorpay'
   subtotal: number
   deliveryFee: number
   total: number
   status: OrderStatus
   date: string
+  // Payment tracking
+  paymentStatus?: 'pending' | 'completed' | 'failed' | 'refunded'
+  razorpayPaymentId?: string
+  razorpayOrderId?: string
   // Location & Delivery fields
   latitude?: number
   longitude?: number
@@ -1317,6 +1322,9 @@ const mapOrderFromDb = (dbOrder: any): Order => ({
   total: Number(dbOrder.total || 0),
   status: dbOrder.status || dbOrder.order_status || 'pending',
   date: dbOrder.date || dbOrder.createdAt || new Date().toISOString(),
+  paymentStatus: dbOrder.payment_status,
+  razorpayPaymentId: dbOrder.razorpay_payment_id,
+  razorpayOrderId: dbOrder.razorpay_order_id,
   latitude: dbOrder.latitude ? Number(dbOrder.latitude) : undefined,
   longitude: dbOrder.longitude ? Number(dbOrder.longitude) : undefined,
   distanceKm: dbOrder.distance_km ? Number(dbOrder.distance_km) : undefined,
@@ -1350,6 +1358,9 @@ const mapOrderToDb = (order: any): any => {
   if (order.latitude !== undefined) dbOrder.latitude = order.latitude
   if (order.longitude !== undefined) dbOrder.longitude = order.longitude
   if (order.distanceKm !== undefined) dbOrder.distance_km = order.distanceKm
+  if (order.paymentStatus !== undefined) dbOrder.payment_status = order.paymentStatus
+  if (order.razorpayPaymentId !== undefined) dbOrder.razorpay_payment_id = order.razorpayPaymentId
+  if (order.razorpayOrderId !== undefined) dbOrder.razorpay_order_id = order.razorpayOrderId
   if (order.estimatedDeliveryTime !== undefined) dbOrder.estimated_delivery_time = order.estimatedDeliveryTime
   if (order.assignedDeliveryPartner !== undefined) dbOrder.assigned_delivery_partner = order.assignedDeliveryPartner
   if (order.deliveryType !== undefined) dbOrder.delivery_type = order.deliveryType
@@ -1514,64 +1525,21 @@ export const useStore = create<HomepageState>((set) => ({
           if (rawPayload[k] !== undefined && rawPayload[k] !== null) cleanPayload[k] = rawPayload[k]
         })
 
-        // 1. Primary insertion into public.orders table
-        supabase.from('orders').insert([cleanPayload]).then(async ({ data, error }) => {
-          if (error) {
-            console.warn('[Supabase Insert Warning] Full schema insert failed on public.orders, running core payload fallback:', error.message || error)
-            const corePayload = {
-              id: order.id,
-              customer_name: order.customerName,
-              customer_phone: order.customerPhone,
-              customer_address: order.customerAddress || order.address || 'Address',
-              items: order.items,
-              payment_method: order.paymentMethod,
-              subtotal: order.subtotal || order.total,
-              delivery_fee: order.deliveryFee || 0,
-              total: order.total,
-              status: order.status,
-              date: order.date || new Date().toISOString()
-            }
-            const { error: coreErr } = await supabase.from('orders').insert([corePayload])
-            if (coreErr) {
-              console.error('[Supabase Insert Error] Failed to insert into public.orders:', coreErr.message || coreErr)
-            } else {
-              console.log('[Supabase Insert Success] Order saved to public.orders core schema!')
-            }
-          } else {
-            console.log('[Supabase Insert Success] Order saved successfully to public.orders!')
-          }
+        // Use the secure backend API route to bypass RLS and handle inserts
+        fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cleanPayload)
         })
-
-        // 2. Dual insertion into public.scheduled_orders if table exists
-        if (order.deliveryType === 'scheduled' || order.scheduledDate || order.scheduledSlot) {
-          const schedPayload: any = {
-            id: order.id,
-            customer_name: order.customerName,
-            customer_phone: order.customerPhone,
-            customer_address: order.customerAddress || order.address || 'Address',
-            items: order.items,
-            payment_method: order.paymentMethod,
-            total: order.total,
-            status: order.status,
-            scheduled_date: order.scheduledDate || new Date().toISOString().split('T')[0],
-            scheduled_slot: order.scheduledSlot || order.scheduledTime || '10:00 AM - 01:00 PM',
-            scheduled_time: order.scheduledTime || order.scheduledSlot
-          }
-          if (order.assignedRiderId) schedPayload.assigned_rider_id = order.assignedRiderId
-          if (order.rescheduleReason) schedPayload.reschedule_reason = order.rescheduleReason
-
-          supabase.from('scheduled_orders').upsert([schedPayload]).then(({ error }) => {
-            if (error) {
-              if (error.code === '42P01' || error.message?.includes('schema cache')) {
-                console.info('[Supabase Note] public.scheduled_orders table not yet created in remote DB schema. Saved via public.orders.')
-              } else {
-                console.warn('[Supabase scheduled_orders sync note]:', error.message || error)
-              }
+          .then(res => res.json())
+          .then(data => {
+            if (data.error) {
+              console.error('[Supabase API Insert Error]', data.error)
             } else {
-              console.log('[Supabase Insert Success] Scheduled order inserted into public.scheduled_orders!')
+              console.log('[Supabase API Insert Success] Order saved successfully!')
             }
           })
-        }
+          .catch(err => console.error('[Supabase API Error]', err))
       }
       return {
         orders: newOrders,

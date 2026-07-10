@@ -26,6 +26,7 @@ interface RazorpayOptions {
   name: string;
   description: string;
   image?: string;
+  order_id?: string;
   handler: (response: RazorpayResponse) => void;
   prefill: {
     name: string;
@@ -504,8 +505,7 @@ export function Header() {
 
     const realKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
 
-    // If there is no real, valid Razorpay key defined, open the simulated payment gateway directly.
-    if (!realKey || realKey.includes('dummy') || realKey.includes('test_key') || realKey === '') {
+    if (!realKey || realKey === '' || realKey.includes('dummy')) {
       console.info("Using simulated Razorpay gateway. To use real SDK, configure NEXT_PUBLIC_RAZORPAY_KEY_ID.")
       setTimeout(() => {
         setIsProcessingCheckout(false)
@@ -524,31 +524,65 @@ export function Header() {
     }
 
     try {
+      // 1. Create order on backend
+      const res = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total * 100, currency: 'INR', receipt: 'receipt_' + Math.random().toString(36).substring(7) })
+      })
+      const orderData = await res.json()
+      
+      if (!res.ok) {
+        throw new Error(orderData.error || 'Failed to create razorpay order')
+      }
+
       const options: RazorpayOptions = {
         key: realKey,
         amount: total * 100, // paise
         currency: 'INR',
         name: 'Fresh Direct Home (FDH)',
         description: 'Premium Sourced Fresh Meat & Cuts',
-        handler: function (response: RazorpayResponse) {
+        order_id: orderData.id,
+        handler: async function (response: RazorpayResponse) {
           setIsProcessingCheckout(true)
-          setTimeout(() => {
-            setIsProcessingCheckout(false)
+          
+          try {
+            // 2. Verify payment on backend
+            const verifyRes = await fetch('/api/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            })
+            const verifyData = await verifyRes.json()
+            
+            if (!verifyRes.ok || !verifyData.success) {
+              throw new Error(verifyData.message || 'Payment verification failed')
+            }
+            
+            // 3. Update order with payment status
             const payId = response.razorpay_payment_id || 'pay_razorpay_mock'
             setTransactionId(payId)
             const orderId = 'FDH-' + Math.floor(1000 + Math.random() * 9000)
             setLastPlacedOrderId(orderId)
+            
             addOrder({
               id: orderId,
               customerName: custName,
               customerPhone: custPhone,
               customerAddress: custAddress,
               items: [...items],
-              paymentMethod: 'online',
+              paymentMethod: 'razorpay',
               subtotal,
               deliveryFee,
               total,
-              status: 'preparing',
+              status: 'paid',
+              paymentStatus: 'completed',
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpayOrderId: response.razorpay_order_id,
               date: new Date().toISOString(),
               latitude: custLatitude,
               longitude: custLongitude,
@@ -559,9 +593,15 @@ export function Header() {
               scheduledSlot: deliveryType === 'scheduled' ? scheduledSlot : undefined,
               scheduledTime: deliveryType === 'scheduled' ? scheduledSlot : undefined,
             })
+            
             setCartStep('success')
             clearCart()
-          }, 1200)
+          } catch (err) {
+            console.error("Payment verification error:", err)
+            alert("Payment verification failed. Please contact support if amount was deducted.")
+          } finally {
+            setIsProcessingCheckout(false)
+          }
         },
         prefill: {
           name: custName,
@@ -662,11 +702,14 @@ export function Header() {
         customerPhone: custPhone,
         customerAddress: custAddress,
         items: [...items],
-        paymentMethod: 'online',
+        paymentMethod: 'razorpay',
         subtotal,
         deliveryFee,
         total,
-        status: 'preparing',
+        status: 'paid',
+        paymentStatus: 'completed',
+        razorpayPaymentId: mockPayId,
+        razorpayOrderId: 'mock_order_' + mockPayId,
         date: new Date().toISOString(),
         latitude: custLatitude,
         longitude: custLongitude,
