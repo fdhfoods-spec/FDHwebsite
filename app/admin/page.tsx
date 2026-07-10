@@ -496,12 +496,12 @@ export default function AdminDashboardPage() {
           {/* Logo Area */}
           <div className="p-5 pb-4" style={{borderBottom: '1px solid #ede8df'}}>
             <Link href="/" className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-lg font-black tracking-tighter shadow-lg flex-shrink-0" style={{background: 'linear-gradient(135deg, #991B1B 0%, #C2410C 100%)', boxShadow: '0 4px 15px rgba(153,27,27,0.3)'}}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-lg font-black tracking-tighter shadow-lg flex-shrink-0" style={{background: 'linear-gradient(135deg, #2d2218 0%, #d4a574 100%)', boxShadow: '0 4px 15px rgba(212,165,116,0.3)'}}>
                 F
               </div>
               <div>
-                <span className="font-extrabold text-sm tracking-tight text-gray-800 block leading-tight">Fresh Delivery</span>
-                <span className="font-bold text-[10px] text-gray-400 tracking-wide">Admin Console</span>
+                <span className="font-extrabold text-sm tracking-tight text-gray-800 block leading-tight">Fresh Direct Home</span>
+                <span className="font-bold text-[10px] tracking-wide" style={{color: '#d4a574'}}>Admin Console</span>
               </div>
             </Link>
             <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg" style={{background: 'rgba(5,150,105,0.07)', border: '1px solid rgba(5,150,105,0.15)'}}>
@@ -526,8 +526,8 @@ export default function AdminDashboardPage() {
                     isActive ? 'text-white' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
                   }`}
                   style={isActive ? {
-                    background: 'linear-gradient(90deg, #991B1B 0%, #C2410C 100%)',
-                    boxShadow: '0 4px 15px rgba(153,27,27,0.2)'
+                    background: 'linear-gradient(90deg, #2d2218 0%, #4a3728 100%)',
+                    boxShadow: '0 4px 15px rgba(45,34,24,0.2)'
                   } : {}}
                 >
                   <div className="flex items-center gap-2.5">
@@ -552,7 +552,7 @@ export default function AdminDashboardPage() {
         {/* User info + logout */}
         <div className="p-4" style={{borderTop: '1px solid #ede8df'}}>
           <div className="flex items-center gap-3 p-3 rounded-xl mb-3" style={{background: '#faf8f3', border: '1px solid #e5e0d5'}}>
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white flex-shrink-0" style={{background: 'linear-gradient(135deg, #991B1B, #C2410C)'}}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white flex-shrink-0" style={{background: 'linear-gradient(135deg, #2d2218, #d4a574)'}}>
               {user?.name?.charAt(0).toUpperCase() || 'A'}
             </div>
             <div className="flex-1 min-w-0">
@@ -614,7 +614,7 @@ export default function AdminDashboardPage() {
           <div className="space-y-6">
             
             {/* Top Executive Welcome Bar */}
-            <div className="relative overflow-hidden rounded-2xl p-6" style={{background: 'linear-gradient(135deg, #991B1B 0%, #C2410C 60%, #ea580c 100%)', boxShadow: '0 8px 32px rgba(153,27,27,0.2)'}}>
+            <div className="relative overflow-hidden rounded-2xl p-6" style={{background: 'linear-gradient(135deg, #2d2218 0%, #4a3728 60%, #d4a574 100%)', boxShadow: '0 8px 32px rgba(45,34,24,0.25)'}}>
               <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl pointer-events-none" style={{background: 'rgba(255,255,255,0.08)'}} />
               <div className="absolute bottom-0 left-1/3 w-48 h-48 rounded-full blur-3xl pointer-events-none" style={{background: 'rgba(255,255,255,0.05)'}} />
               <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -966,7 +966,8 @@ export default function AdminDashboardPage() {
                   placeholder="Search meat cuts..."
                   value={productSearchQuery}
                   onChange={(e) => setProductSearchQuery(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-12 pr-4 py-3 text-xs outline-none focus:border-secondary text-white"
+                  className="w-full rounded-xl pl-12 pr-4 py-3 text-xs outline-none"
+                  style={{background: '#ffffff', border: '1px solid #e5e0d5', color: '#1a1410'}}
                 />
               </div>
 
@@ -974,6 +975,7 @@ export default function AdminDashboardPage() {
               <Button
                 onClick={() => setIsAddProductOpen(true)}
                 className="bg-secondary hover:bg-secondary/90 text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2 py-6 px-6 rounded-xl"
+                style={{background: 'linear-gradient(135deg, #2d2218, #d4a574)', boxShadow: '0 4px 15px rgba(212,165,116,0.3)'}}
               >
                 <Plus className="w-4 h-4" />
                 Add New Cut
@@ -981,11 +983,11 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Products grid */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+            <div className="rounded-2xl overflow-hidden shadow-sm" style={{background: '#ffffff', border: '1px solid #e5e0d5'}}>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-800 bg-slate-950/60 text-[10px] uppercase tracking-wider font-extrabold text-slate-400">
+                    <tr className="text-[10px] uppercase tracking-wider font-extrabold" style={{borderBottom: '1px solid #ede8df', background: '#faf8f3', color: '#8b7d70'}}>
                       <th className="p-4">Product Info</th>
                       <th className="p-4">Category</th>
                       <th className="p-4">Portion Weight</th>
@@ -995,15 +997,15 @@ export default function AdminDashboardPage() {
                       <th className="p-4 text-center">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800 text-xs">
+                  <tbody className="divide-y text-xs" style={{borderColor: '#f5f0e8'}}>
                     {filteredProducts.map(p => (
-                      <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
+                      <tr key={p.id} className="transition-colors" style={{borderBottom: '1px solid #f5f0e8'}} onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background='#faf8f3'} onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background=''}>
                         <td className="p-4 font-bold flex items-start gap-3 min-w-[280px]">
-                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-slate-950 flex-shrink-0 border border-slate-800 group">
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 group" style={{background: '#f5f0e8', border: '1px solid #e5e0d5'}}>
                             {isValidImageUrl(p.image) ? (
                               <Image src={p.image} alt={p.name} fill className="object-cover" />
                             ) : (
-                              <div className="absolute inset-0 bg-slate-950 flex items-center justify-center text-slate-600">
+                              <div className="absolute inset-0 flex items-center justify-center" style={{background: '#f5f0e8', color: '#8b7d70'}}>
                                 <ImageIcon className="w-5 h-5" />
                               </div>
                             )}
@@ -1029,7 +1031,8 @@ export default function AdminDashboardPage() {
                               type="text"
                               value={p.name}
                               onChange={(e) => updateProduct(p.id, { name: e.target.value })}
-                              className="bg-slate-950/60 border border-slate-850 px-2 py-0.5 rounded w-full font-black text-white outline-none focus:border-secondary"
+                              className="px-2 py-0.5 rounded w-full font-black outline-none"
+                              style={{background: '#f5f0e8', border: '1px solid #e5e0d5', color: '#1a1410'}}
                             />
                             <div className="flex items-center gap-1">
                               <span className="text-slate-500 font-semibold text-[9px] flex-shrink-0">URL:</span>
@@ -1038,18 +1041,20 @@ export default function AdminDashboardPage() {
                                 value={p.image}
                                 placeholder="Image URL..."
                                 onChange={(e) => updateProduct(p.id, { image: e.target.value })}
-                                className="bg-slate-950/60 border border-slate-850 px-2 py-0.5 rounded w-full text-[9px] font-semibold text-slate-400 outline-none focus:border-secondary focus:text-white"
+                                className="px-2 py-0.5 rounded w-full text-[9px] font-semibold outline-none"
+                                style={{background: '#f5f0e8', border: '1px solid #e5e0d5', color: '#8b7d70'}}
                               />
                             </div>
                           </div>
                         </td>
-                        <td className="p-4 font-semibold text-slate-300 capitalize">{p.category}</td>
+                        <td className="p-4 font-semibold capitalize" style={{color: '#6b6358'}}>{p.category}</td>
                         <td className="p-4">
                           <input
                             type="text"
                             value={p.weight}
                             onChange={(e) => updateProduct(p.id, { weight: e.target.value })}
-                            className="bg-slate-950/60 border border-slate-850 px-2 py-1 rounded w-20 text-center font-bold text-white outline-none"
+                            className="px-2 py-1 rounded w-20 text-center font-bold outline-none"
+                            style={{background: '#f5f0e8', border: '1px solid #e5e0d5', color: '#1a1410'}}
                           />
                         </td>
                         <td className="p-4">
@@ -1057,7 +1062,8 @@ export default function AdminDashboardPage() {
                             type="number"
                             value={p.price}
                             onChange={(e) => updateProduct(p.id, { price: parseInt(e.target.value) || 0 })}
-                            className="bg-slate-950/60 border border-slate-850 px-2 py-1 rounded w-20 text-center font-black text-white outline-none"
+                            className="px-2 py-1 rounded w-20 text-center font-black outline-none"
+                            style={{background: '#f5f0e8', border: '1px solid #e5e0d5', color: '#1a1410'}}
                           />
                         </td>
                         <td className="p-4">
@@ -1065,7 +1071,8 @@ export default function AdminDashboardPage() {
                             type="number"
                             value={p.originalPrice}
                             onChange={(e) => updateProduct(p.id, { originalPrice: parseInt(e.target.value) || 0 })}
-                            className="bg-slate-950/60 border border-slate-850 px-2 py-1 rounded w-20 text-center text-slate-400 font-semibold outline-none"
+                            className="px-2 py-1 rounded w-20 text-center font-semibold outline-none"
+                            style={{background: '#f5f0e8', border: '1px solid #e5e0d5', color: '#8b7d70'}}
                           />
                         </td>
                         <td className="p-4">
@@ -1073,13 +1080,14 @@ export default function AdminDashboardPage() {
                             type="text"
                             value={p.badge}
                             onChange={(e) => updateProduct(p.id, { badge: e.target.value })}
-                            className="bg-slate-950/60 border border-slate-850 px-3 py-1 rounded w-32 font-bold text-secondary outline-none"
+                            className="px-3 py-1 rounded w-32 font-bold outline-none"
+                            style={{background: '#f5f0e8', border: '1px solid #e5e0d5', color: '#d4a574'}}
                           />
                         </td>
                         <td className="p-4 text-center">
                           <button
                             onClick={() => setDeleteConfirmProduct({ id: p.id, name: p.name })}
-                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-950/20 rounded-lg transition-all"
+                            className="p-2 rounded-lg transition-all text-gray-300 hover:text-red-500 hover:bg-red-50"
                             title="Delete product"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -1123,11 +1131,10 @@ export default function AdminDashboardPage() {
                   <button
                     key={f.id}
                     onClick={() => setOrderFilter(f.id as any)}
-                    className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
-                      orderFilter === f.id
-                        ? 'bg-secondary border-secondary text-white font-bold'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold border transition-all"
+                    style={orderFilter === f.id
+                      ? {background: 'linear-gradient(135deg, #2d2218, #d4a574)', borderColor: '#d4a574', color: '#ffffff'}
+                      : {background: '#ffffff', borderColor: '#e5e0d5', color: '#6b6358'}}
                   >
                     {f.label}
                   </button>
@@ -1137,19 +1144,21 @@ export default function AdminDashboardPage() {
               {/* Order Search & Vendor Filter */}
               <div className="flex items-center gap-2 flex-grow max-w-md">
                 <div className="relative flex-grow">
-                  <Search className="w-4 h-4 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2" style={{color: '#8b7d70'}} />
                   <input
                     type="text"
                     placeholder="ID, Customer, Phone..."
                     value={orderSearchQuery}
                     onChange={(e) => setOrderSearchQuery(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-12 pr-4 py-2.5 text-xs outline-none focus:border-secondary text-white"
+                    className="w-full rounded-xl pl-12 pr-4 py-2.5 text-xs outline-none"
+                    style={{background: '#ffffff', border: '1px solid #e5e0d5', color: '#1a1410'}}
                   />
                 </div>
                 <select
                   value={adminVendorFilter}
                   onChange={(e) => setAdminVendorFilter(e.target.value)}
-                  className="bg-slate-900 border border-slate-800 text-white text-xs font-bold py-2.5 px-3 rounded-xl outline-none focus:border-secondary shrink-0"
+                  className="text-xs font-bold py-2.5 px-3 rounded-xl outline-none shrink-0"
+                  style={{background: '#ffffff', border: '1px solid #e5e0d5', color: '#1a1410'}}
                 >
                   <option value="all">All Vendors</option>
                   <option value="VND-001">Standard Poultry Farms</option>
@@ -1283,34 +1292,37 @@ export default function AdminDashboardPage() {
         {activeTab === 'delivery' && (
           <div className="space-y-8">
             {/* Create delivery partner form */}
-            <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-              <h3 className="text-sm font-bold text-white mb-4 uppercase tracking-wider text-slate-300">Register New Rider</h3>
+            <div className="p-6 rounded-2xl" style={{background: '#ffffff', border: '1px solid #e5e0d5', boxShadow: '0 2px 12px rgba(0,0,0,0.04)'}}>
+              <h3 className="text-sm font-bold mb-4 uppercase tracking-wider pb-3" style={{color: '#2d2218', borderBottom: '1px solid #ede8df'}}>Register New Rider</h3>
               <form onSubmit={handleCreatePartner} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div className="space-y-1.5">
-                  <label className="text-[9px] uppercase font-bold text-slate-400">Rider Full Name</label>
+                  <label className="text-[9px] uppercase font-bold tracking-wider" style={{color: '#8b7d70'}}>Rider Full Name</label>
                   <input
                     type="text"
                     placeholder="Enter name..."
                     value={newPartnerName}
                     onChange={(e) => setNewPartnerName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-secondary text-white font-semibold"
+                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none font-semibold"
+                    style={{background: '#faf8f3', border: '1px solid #e5e0d5', color: '#1a1410'}}
                     required
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[9px] uppercase font-bold text-slate-400">Mobile Phone</label>
+                  <label className="text-[9px] uppercase font-bold tracking-wider" style={{color: '#8b7d70'}}>Mobile Phone</label>
                   <input
                     type="tel"
                     placeholder="Enter 10-digit number..."
                     value={newPartnerPhone}
                     onChange={(e) => setNewPartnerPhone(e.target.value.replace(/\D/g, ''))}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-secondary text-white font-semibold"
+                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none font-semibold"
+                    style={{background: '#faf8f3', border: '1px solid #e5e0d5', color: '#1a1410'}}
                     required
                   />
                 </div>
                 <Button
                   type="submit"
-                  className="bg-secondary hover:bg-secondary/90 text-white font-bold text-xs uppercase tracking-widest py-5 rounded-xl flex items-center justify-center gap-1.5"
+                  className="text-white font-bold text-xs uppercase tracking-widest py-5 rounded-xl flex items-center justify-center gap-1.5"
+                  style={{background: 'linear-gradient(135deg, #2d2218, #d4a574)', boxShadow: '0 4px 15px rgba(212,165,116,0.3)'}}
                 >
                   <Plus className="w-4 h-4" /> Register Partner
                 </Button>
@@ -1319,13 +1331,13 @@ export default function AdminDashboardPage() {
 
             {/* List of active delivery partners */}
             <div className="space-y-4">
-              <h3 className="text-xs uppercase font-extrabold text-slate-400 tracking-wider">Active Delivery Team ({deliveryPartners.length})</h3>
+              <h3 className="text-xs uppercase font-extrabold tracking-wider" style={{color: '#8b7d70'}}>Active Delivery Team ({deliveryPartners.length})</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {deliveryPartners.map(dp => (
-                  <div key={dp.id} className="p-4 bg-slate-900 border border-slate-800 rounded-2xl flex justify-between items-center shadow-sm">
+                  <div key={dp.id} className="p-4 rounded-2xl flex justify-between items-center shadow-sm" style={{background: '#ffffff', border: '1px solid #e5e0d5'}}>
                     <div className="space-y-1">
-                      <h4 className="text-xs font-black text-white">{dp.name}</h4>
-                      <p className="text-[10px] text-slate-500 font-semibold flex items-center gap-1">
+                      <h4 className="text-xs font-black" style={{color: '#1a1410'}}>{dp.name}</h4>
+                      <p className="text-[10px] font-semibold flex items-center gap-1" style={{color: '#8b7d70'}}>
                         <Phone className="w-3 h-3 text-slate-600" /> +91 {dp.phone}
                       </p>
                     </div>
@@ -1334,15 +1346,16 @@ export default function AdminDashboardPage() {
                         onClick={() => updateDeliveryPartner(dp.id, { status: dp.status === 'active' ? 'inactive' : 'active' })}
                         className={`text-[9px] font-extrabold px-2 py-0.5 rounded border uppercase transition-all ${
                           dp.status === 'active'
-                            ? 'bg-emerald-600/10 text-emerald-500 border-emerald-500/20'
-                            : 'bg-slate-950 text-slate-500 border-slate-800'
+                            ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                            : 'text-gray-400'
                         }`}
+                        style={dp.status !== 'active' ? {background: '#f5f0e8', borderColor: '#e5e0d5'} : {}}
                       >
                         {dp.status}
                       </button>
                       <button
                         onClick={() => deleteDeliveryPartner(dp.id)}
-                        className="p-1.5 text-slate-500 hover:text-red-500 rounded-lg hover:bg-red-950/20"
+                        className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -1358,81 +1371,87 @@ export default function AdminDashboardPage() {
         {activeTab === 'settings' && (
           <div className="space-y-8 max-w-3xl">
             {/* Payment toggles */}
-            <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl space-y-6">
-              <h3 className="text-sm font-bold text-white mb-2 uppercase tracking-wider border-b border-slate-800 pb-3">Checkout Methods Controls</h3>
+            <div className="p-6 rounded-2xl space-y-6" style={{background: '#ffffff', border: '1px solid #e5e0d5', boxShadow: '0 2px 12px rgba(0,0,0,0.04)'}}>
+              <h3 className="text-sm font-bold mb-2 uppercase tracking-wider pb-3" style={{color: '#2d2218', borderBottom: '1px solid #ede8df'}}>Checkout Methods Controls</h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center p-4 rounded-xl" style={{background: '#faf8f3', border: '1px solid #ede8df'}}>
                   <div>
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Cash on Delivery (COD)</h4>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Allow users to select Cash collection upon receiving cuts.</p>
+                    <h4 className="text-xs font-bold uppercase tracking-wider" style={{color: '#2d2218'}}>Cash on Delivery (COD)</h4>
+                    <p className="text-[10px] mt-0.5" style={{color: '#8b7d70'}}>Allow users to select Cash collection upon receiving cuts.</p>
                   </div>
                   <button
                     onClick={() => updateSettings({ enableCod: !enableCod })}
-                    className={`w-12 h-6 rounded-full p-1 transition-all ${enableCod ? 'bg-secondary' : 'bg-slate-800'}`}
+                    className={`w-12 h-6 rounded-full p-1 transition-all flex-shrink-0`}
+                    style={{background: enableCod ? '#d4a574' : '#e5e0d5'}}
                   >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-all transform ${enableCod ? 'translate-x-6' : 'translate-x-0'}`} />
+                    <div className={`w-4 h-4 rounded-full bg-white transition-all transform ${enableCod ? 'translate-x-6' : 'translate-x-0'}`} style={{boxShadow: '0 1px 3px rgba(0,0,0,0.2)'}} />
                   </button>
                 </div>
 
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center p-4 rounded-xl" style={{background: '#faf8f3', border: '1px solid #ede8df'}}>
                   <div>
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Online Razorpay Checkout</h4>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Toggle credit cards, UPI, and netbanking gateways.</p>
+                    <h4 className="text-xs font-bold uppercase tracking-wider" style={{color: '#2d2218'}}>Online Razorpay Checkout</h4>
+                    <p className="text-[10px] mt-0.5" style={{color: '#8b7d70'}}>Toggle credit cards, UPI, and netbanking gateways.</p>
                   </div>
                   <button
                     onClick={() => updateSettings({ enableOnline: !enableOnline })}
-                    className={`w-12 h-6 rounded-full p-1 transition-all ${enableOnline ? 'bg-secondary' : 'bg-slate-800'}`}
+                    className={`w-12 h-6 rounded-full p-1 transition-all flex-shrink-0`}
+                    style={{background: enableOnline ? '#d4a574' : '#e5e0d5'}}
                   >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-all transform ${enableOnline ? 'translate-x-6' : 'translate-x-0'}`} />
+                    <div className={`w-4 h-4 rounded-full bg-white transition-all transform ${enableOnline ? 'translate-x-6' : 'translate-x-0'}`} style={{boxShadow: '0 1px 3px rgba(0,0,0,0.2)'}} />
                   </button>
                 </div>
 
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center p-4 rounded-xl" style={{background: '#faf8f3', border: '1px solid #ede8df'}}>
                   <div>
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">WhatsApp Dispatch Checkout</h4>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Toggle redirection to WA agent support checkouts.</p>
+                    <h4 className="text-xs font-bold uppercase tracking-wider" style={{color: '#2d2218'}}>WhatsApp Dispatch Checkout</h4>
+                    <p className="text-[10px] mt-0.5" style={{color: '#8b7d70'}}>Toggle redirection to WA agent support checkouts.</p>
                   </div>
                   <button
                     onClick={() => updateSettings({ enableWhatsappCheckout: !enableWhatsappCheckout })}
-                    className={`w-12 h-6 rounded-full p-1 transition-all ${enableWhatsappCheckout ? 'bg-secondary' : 'bg-slate-800'}`}
+                    className={`w-12 h-6 rounded-full p-1 transition-all flex-shrink-0`}
+                    style={{background: enableWhatsappCheckout ? '#d4a574' : '#e5e0d5'}}
                   >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-all transform ${enableWhatsappCheckout ? 'translate-x-6' : 'translate-x-0'}`} />
+                    <div className={`w-4 h-4 rounded-full bg-white transition-all transform ${enableWhatsappCheckout ? 'translate-x-6' : 'translate-x-0'}`} style={{boxShadow: '0 1px 3px rgba(0,0,0,0.2)'}} />
                   </button>
                 </div>
               </div>
             </div>
 
             {/* Threshold overrides */}
-            <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl space-y-6">
-              <h3 className="text-sm font-bold text-white mb-2 uppercase tracking-wider border-b border-slate-800 pb-3">Delivery Parameters Overrides</h3>
+            <div className="p-6 rounded-2xl space-y-6" style={{background: '#ffffff', border: '1px solid #e5e0d5', boxShadow: '0 2px 12px rgba(0,0,0,0.04)'}}>
+              <h3 className="text-sm font-bold mb-2 uppercase tracking-wider pb-3" style={{color: '#2d2218', borderBottom: '1px solid #ede8df'}}>Delivery Parameters Overrides</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[9px] uppercase font-bold text-slate-400">WhatsApp Agent Phone</label>
+                  <label className="text-[9px] uppercase font-bold tracking-wider" style={{color: '#8b7d70'}}>WhatsApp Agent Phone</label>
                   <input
                     type="text"
                     value={whatsappNumber}
                     onChange={(e) => updateSettings({ whatsappNumber: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-secondary text-white font-bold"
+                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none font-bold"
+                    style={{background: '#faf8f3', border: '1px solid #e5e0d5', color: '#1a1410'}}
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[9px] uppercase font-bold text-slate-400">Delivery Fee (₹)</label>
+                  <label className="text-[9px] uppercase font-bold tracking-wider" style={{color: '#8b7d70'}}>Delivery Fee (₹)</label>
                   <input
                     type="number"
                     value={deliveryFee}
                     onChange={(e) => updateSettings({ deliveryFee: parseInt(e.target.value) || 0 })}
-                    className="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-secondary text-white font-bold"
+                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none font-bold"
+                    style={{background: '#faf8f3', border: '1px solid #e5e0d5', color: '#1a1410'}}
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[9px] uppercase font-bold text-slate-400">Free Delivery Cap (₹)</label>
+                  <label className="text-[9px] uppercase font-bold tracking-wider" style={{color: '#8b7d70'}}>Free Delivery Cap (₹)</label>
                   <input
                     type="number"
                     value={freeDeliveryLimit}
                     onChange={(e) => updateSettings({ freeDeliveryLimit: parseInt(e.target.value) || 0 })}
-                    className="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-secondary text-white font-bold"
+                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none font-bold"
+                    style={{background: '#faf8f3', border: '1px solid #e5e0d5', color: '#1a1410'}}
                   />
                 </div>
               </div>
