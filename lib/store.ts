@@ -1415,7 +1415,7 @@ export const useStore = create<HomepageState>((set) => ({
       ...p,
       sku,
       barcode,
-      brand: 'Fresh Delivery Hub',
+      brand: 'Fresh Direct Home',
       vendorId: vId,
       vendorName: vName,
       costPrice,

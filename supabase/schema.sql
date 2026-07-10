@@ -1,5 +1,5 @@
 -- ========================================================
--- Fresh Delivery Hub (FDH) Complete Production Schema
+-- Fresh Direct Home (FDH) Complete Production Schema
 -- Supabase PostgreSQL Database DDL Migration Script
 -- ========================================================
 

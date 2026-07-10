@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
     const fromNumber = isWhatsapp ? `whatsapp:${twilioWhatsapp}` : twilioPhone
     const toNumber = isWhatsapp ? `whatsapp:${formattedPhone}` : formattedPhone
-    const messageBody = `Your Fresh Delivery Hub verification code is: ${code}`
+    const messageBody = `Your Fresh Direct Home verification code is: ${code}`
 
     const twilioParams = new URLSearchParams({
       From: fromNumber,

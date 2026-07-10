@@ -105,7 +105,7 @@ export function Footer() {
                   FDH
                 </span>
                 <span className="font-sans text-[10px] tracking-widest text-orange-400 font-semibold uppercase leading-none">
-                  Fresh Delivery Hub
+                  Fresh Direct Home
                 </span>
               </div>
             </Link>
@@ -212,7 +212,7 @@ export function Footer() {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-white/40">
           
           <div>
-            <p>&copy; {new Date().getFullYear()} Fresh Delivery Hub (FDH). All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Fresh Direct Home (FDH). All rights reserved.</p>
           </div>
 
           {/* Payment Partner Declarations */}

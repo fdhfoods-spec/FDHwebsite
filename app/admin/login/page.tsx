@@ -86,7 +86,7 @@ export default function AdminLoginPage() {
             F
           </div>
           <span className="font-extrabold text-base tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-            Fresh Delivery Hub
+            Fresh Direct Home
           </span>
         </Link>
 
@@ -172,7 +172,7 @@ export default function AdminLoginPage() {
 
       {/* Footer */}
       <footer className="p-6 text-center text-xs text-slate-500 border-t border-slate-900 relative z-10">
-        &copy; 2026 Fresh Delivery Hub. Internal Administrative System.
+        &copy; 2026 Fresh Direct Home. Internal Administrative System.
       </footer>
     </div>
   )

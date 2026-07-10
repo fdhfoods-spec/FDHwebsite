@@ -214,7 +214,8 @@ export function CustomerProfileModal({ customer, onClose }: CustomerProfileModal
                 {customerOrders.length === 0 ? (
                   <div className="p-8 text-center text-slate-500 text-xs">No order records found for this customer.</div>
                 ) : (
-                  <table className="w-full text-left border-collapse text-xs">
+                  <div className="overflow-x-auto w-full">
+<table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className="border-b border-slate-800 bg-slate-900/60 text-[10px] uppercase tracking-wider font-black text-slate-400">
                         <th className="p-3">Order ID</th>
@@ -242,6 +243,7 @@ export function CustomerProfileModal({ customer, onClose }: CustomerProfileModal
                       ))}
                     </tbody>
                   </table>
+</div>
                 )}
               </div>
             </div>

@@ -2,7 +2,7 @@ export function StructuredData() {
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'FDH - Fresh Delivery Hub',
+    name: 'FDH - Fresh Direct Home',
     url: 'https://freshdeliveryhub.com',
     logo: 'https://freshdeliveryhub.com/fdh-logo.png',
     description: 'Premium meat delivery service with fresh, quality cuts delivered within 24 hours',
@@ -20,7 +20,7 @@ export function StructuredData() {
   const localBusinessSchema = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    name: 'FDH - Fresh Delivery Hub',
+    name: 'FDH - Fresh Direct Home',
     image: 'https://freshdeliveryhub.com/fdh-hero.png',
     description: 'Premium meat delivery service',
     address: {

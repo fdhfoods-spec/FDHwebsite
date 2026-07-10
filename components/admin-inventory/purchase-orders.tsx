@@ -375,7 +375,8 @@ export function PurchaseOrderManager({ userRole }: PurchaseOrderManagerProps) {
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider">Purchase Items Checklist</h4>
                 <div className="border border-slate-800 rounded-xl overflow-hidden max-h-[160px] overflow-y-auto">
-                  <table className="w-full text-left border-collapse text-xs">
+                  <div className="overflow-x-auto w-full">
+<table className="w-full text-left border-collapse text-xs">
                     <tr className="bg-slate-950 border-b border-slate-800 text-[10px] uppercase text-slate-500 font-bold">
                       <th className="p-2">Item</th>
                       <th className="p-2">Variant SKU</th>
@@ -403,6 +404,7 @@ export function PurchaseOrderManager({ userRole }: PurchaseOrderManagerProps) {
                       </tr>
                     ))}
                   </table>
+</div>
                 </div>
               </div>
 
@@ -452,7 +454,8 @@ export function PurchaseOrderManager({ userRole }: PurchaseOrderManagerProps) {
 
             <form onSubmit={handleSaveIntake} className="space-y-4">
               <div className="border border-slate-800 rounded-xl overflow-hidden">
-                <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto w-full">
+<table className="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr className="bg-slate-950 border-b border-slate-800 text-[10px] uppercase text-slate-400 font-bold">
                       <th className="p-3">Product Item</th>
@@ -514,6 +517,7 @@ export function PurchaseOrderManager({ userRole }: PurchaseOrderManagerProps) {
                     })}
                   </tbody>
                 </table>
+</div>
               </div>
 
               <div className="flex gap-2 pt-2">

@@ -5,7 +5,7 @@ import { SupabaseInitializer } from '@/components/supabase-initializer'
 import { StructuredData } from '@/components/structured-data'
 
 export const metadata: Metadata = {
-  title: 'Fresh Delivery Hub (FDH) | Premium Fresh Meat Delivery',
+  title: 'Fresh Direct Home (FDH) | Premium Fresh Meat Delivery',
   description: 'FDH represents premium fresh meat and seafood delivery. Sourced fresh daily, hygienically processed, and delivered in vacuum sealed packages at your chosen schedule.',
   generator: 'v0.app',
   icons: {

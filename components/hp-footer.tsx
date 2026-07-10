@@ -14,7 +14,7 @@ export function HpFooter() {
           <div>
             <div className="text-2xl font-bold mb-2">FDH</div>
             <p className="text-sm text-primary-foreground/80 mb-4">
-              Fresh Delivery Hub - Premium meat delivery service.
+              Fresh Direct Home - Premium meat delivery service.
             </p>
             <div className="flex gap-4">
               <a href="mailto:hello@fdh.com" className="hover:text-secondary transition-colors" title="Email">
@@ -159,7 +159,7 @@ export function HpFooter() {
 
         {/* Bottom */}
         <div className="border-t border-primary-foreground/20 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-primary-foreground/80">
-          <p>&copy; {currentYear} Fresh Delivery Hub. All rights reserved.</p>
+          <p>&copy; {currentYear} Fresh Direct Home. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <span className="hover:text-secondary transition-colors cursor-default">
               Privacy Policy

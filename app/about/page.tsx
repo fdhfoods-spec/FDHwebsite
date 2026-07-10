@@ -58,11 +58,11 @@ export default function AboutPage() {
                 Who We Are
               </span>
               <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight uppercase">
-                Fresh Delivery Hub <br />
+                Fresh Direct Home <br />
                 <span className="text-secondary font-serif font-medium italic lowercase">is</span> Redefining Meat Standards
               </h1>
               <p className="text-slate-400 text-sm md:text-base leading-relaxed">
-                Fresh Delivery Hub (FDH) was founded on a simple principle: you shouldn’t have to compromise on hygiene, safety, and source transparency when buying fresh cuts. We handle curation, custom cutting, and cold chain shipping in-house to deliver the cleanest cuts possible.
+                Fresh Direct Home (FDH) was founded on a simple principle: you shouldn’t have to compromise on hygiene, safety, and source transparency when buying fresh cuts. We handle curation, custom cutting, and cold chain shipping in-house to deliver the cleanest cuts possible.
               </p>
             </div>
             <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl group">

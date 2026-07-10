@@ -1,5 +1,5 @@
 -- ========================================================
--- Fresh Delivery Hub (FDH) SQL Migration Script
+-- Fresh Direct Home (FDH) SQL Migration Script
 -- Migration: Create Addresses Table with Row Level Security
 -- ========================================================
 

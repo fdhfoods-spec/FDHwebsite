@@ -528,7 +528,7 @@ export function Header() {
         key: realKey,
         amount: total * 100, // paise
         currency: 'INR',
-        name: 'Fresh Delivery Hub (FDH)',
+        name: 'Fresh Direct Home (FDH)',
         description: 'Premium Sourced Fresh Meat & Cuts',
         handler: function (response: RazorpayResponse) {
           setIsProcessingCheckout(true)
@@ -602,7 +602,7 @@ export function Header() {
       ? `*Delivery Schedule:* Scheduled for ${scheduledDate} (${scheduledSlot})\n`
       : `*Delivery Schedule:* Immediate Dispatch\n`
 
-    const message = `*Fresh Delivery Hub (FDH) Order Details*\n\n` +
+    const message = `*Fresh Direct Home (FDH) Order Details*\n\n` +
       `*Customer Name:* ${custName}\n` +
       `*Phone:* ${custPhone}\n` +
       `*Delivery Address:* ${custAddress}\n` +
@@ -794,7 +794,7 @@ export function Header() {
               <div className="flex flex-col">
                 <span className="font-sans font-bold text-lg leading-tight tracking-wider text-primary">FDH</span>
                 <span className="font-sans text-[10px] tracking-widest text-secondary font-semibold uppercase leading-none">
-                  Fresh Delivery Hub
+                  Fresh Direct Home
                 </span>
               </div>
             </Link>
@@ -1156,12 +1156,7 @@ export function Header() {
 
             {/* Mobile Search Button */}
             <button
-              onClick={() => {
-                const searchSection = document.getElementById('premium-search-section')
-                if (searchSection) {
-                  searchSection.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                }
-              }}
+              onClick={() => setSearchFocused(true)}
               className="p-2.5 hover:bg-primary/5 active:bg-primary/10 rounded-full transition-colors text-foreground/80 md:hidden"
               aria-label="Search"
             >
@@ -1279,8 +1274,20 @@ export function Header() {
                       key={link.name}
                       href={link.href}
                       onClick={(e) => {
-                        if (link.onClick) link.onClick(e)
+                        e.preventDefault()
                         setIsMenuOpen(false)
+                        setTimeout(() => {
+                          if (pathname === '/') {
+                            const el = document.getElementById(link.sectionId)
+                            if (el) {
+                              const headerOffset = 90
+                              const offsetPosition = el.getBoundingClientRect().top + window.pageYOffset - headerOffset
+                              window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+                            }
+                          } else {
+                            router.push(link.href)
+                          }
+                        }, 350) // Wait for menu collapse animation to finish
                       }}
                       className={`block px-4 py-3 rounded-lg font-sans font-semibold text-sm transition-colors ${
                         isActive 
@@ -1297,15 +1304,18 @@ export function Header() {
               <div className="flex flex-col gap-3 px-4">
                 {user ? (
                   <div className="flex flex-col gap-2 p-2.5 bg-muted/40 rounded-xl border border-gray-100">
-                    <div className="flex items-center gap-2.5 px-1.5">
-                      <div className="w-7 h-7 rounded-full bg-secondary text-white flex items-center justify-center text-xs font-extrabold uppercase">
-                        {user.name.slice(0, 2)}
+                    <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between px-1.5 hover:bg-white p-2 rounded-lg transition-colors group">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-secondary text-white flex items-center justify-center text-xs font-extrabold uppercase">
+                          {user.name.slice(0, 2)}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-primary group-hover:text-secondary transition-colors">{user.name}</span>
+                          <span className="text-[9px] text-foreground/45 leading-none group-hover:text-foreground/70 transition-colors">{user.email}</span>
+                        </div>
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold text-primary">{user.name}</span>
-                        <span className="text-[9px] text-foreground/45 leading-none">{user.email}</span>
-                      </div>
-                    </div>
+                      <ChevronDown className="-rotate-90 w-4 h-4 text-foreground/40 group-hover:text-secondary transition-colors" />
+                    </Link>
                     <Button
                       variant="outline"
                       onClick={async () => {
@@ -1899,7 +1909,7 @@ export function Header() {
                     <div className="bg-[#0f2d59] p-4 text-white flex justify-between items-center flex-shrink-0">
                       <div className="flex flex-col">
                         <span className="text-[9px] uppercase tracking-widest text-slate-300 font-extrabold leading-none">Merchant</span>
-                        <span className="text-xs font-bold tracking-wide mt-1">Fresh Delivery Hub (FDH)</span>
+                        <span className="text-xs font-bold tracking-wide mt-1">Fresh Direct Home (FDH)</span>
                       </div>
                       <div className="text-right">
                         <p className="text-[9px] text-slate-300 uppercase leading-none">Amount</p>

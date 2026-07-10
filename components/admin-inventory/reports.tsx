@@ -134,7 +134,8 @@ export function InventoryReports({ userRole }: InventoryReportsProps) {
 
             {/* Structured Table */}
             <div className="border border-slate-850 rounded-xl overflow-hidden print:border-black">
-              <table className="w-full text-left border-collapse text-xs">
+              <div className="overflow-x-auto w-full">
+<table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-950 border-b border-slate-800 text-[10px] uppercase text-slate-400 font-bold print:text-black print:border-black print:bg-slate-100">
                     <th className="p-3">Product Name</th>
@@ -158,6 +159,7 @@ export function InventoryReports({ userRole }: InventoryReportsProps) {
                   ))}
                 </tbody>
               </table>
+</div>
             </div>
           </div>
         )}
@@ -173,7 +175,8 @@ export function InventoryReports({ userRole }: InventoryReportsProps) {
             </div>
 
             <div className="border border-slate-850 rounded-xl overflow-hidden print:border-black">
-              <table className="w-full text-left border-collapse text-xs">
+              <div className="overflow-x-auto w-full">
+<table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-950 border-b border-slate-800 text-[10px] uppercase text-slate-400 font-bold print:text-black print:bg-slate-100">
                     <th className="p-3">Item Name</th>
@@ -200,6 +203,7 @@ export function InventoryReports({ userRole }: InventoryReportsProps) {
                   })}
                 </tbody>
               </table>
+</div>
             </div>
           </div>
         )}
@@ -207,7 +211,8 @@ export function InventoryReports({ userRole }: InventoryReportsProps) {
         {selectedReport === 'vendors' && (
           <div className="space-y-4">
             <div className="border border-slate-850 rounded-xl overflow-hidden print:border-black">
-              <table className="w-full text-left border-collapse text-xs">
+              <div className="overflow-x-auto w-full">
+<table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-950 border-b border-slate-800 text-[10px] uppercase text-slate-400 font-bold print:text-black print:bg-slate-100">
                     <th className="p-3">Vendor / Supplier</th>
@@ -241,6 +246,7 @@ export function InventoryReports({ userRole }: InventoryReportsProps) {
                   ))}
                 </tbody>
               </table>
+</div>
             </div>
           </div>
         )}
@@ -248,7 +254,8 @@ export function InventoryReports({ userRole }: InventoryReportsProps) {
         {selectedReport === 'movement' && (
           <div className="space-y-4">
             <div className="border border-slate-850 rounded-xl overflow-hidden print:border-black">
-              <table className="w-full text-left border-collapse text-xs">
+              <div className="overflow-x-auto w-full">
+<table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-950 border-b border-slate-800 text-[10px] uppercase text-slate-400 font-bold print:text-black print:bg-slate-100">
                     <th className="p-3">Timestamp</th>
@@ -284,6 +291,7 @@ export function InventoryReports({ userRole }: InventoryReportsProps) {
                   })}
                 </tbody>
               </table>
+</div>
             </div>
           </div>
         )}

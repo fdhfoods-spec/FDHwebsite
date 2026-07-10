@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { Clock, Store, PlusCircle, CheckCircle2, Truck } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'How It Works - Fresh Delivery Hub',
+  title: 'How It Works - Fresh Direct Home',
   description: 'Slot-first delivery — built for freshness, not speed theatre.',
 }
 

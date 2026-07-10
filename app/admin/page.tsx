@@ -1180,7 +1180,8 @@ export default function AdminDashboardPage() {
                       <p className="text-sm font-bold text-gray-400">No orders match this filter</p>
                     </div>
                   ) : (
-                    <table className="w-full text-left border-collapse">
+                    <div className="overflow-x-auto w-full">
+<table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="text-[9px] uppercase font-bold text-gray-400 tracking-wider" style={{ borderBottom: '1px solid #f0ece4' }}>
                           <th className="px-4 py-3">Order ID</th>
@@ -1257,6 +1258,7 @@ export default function AdminDashboardPage() {
                         })}
                       </tbody>
                     </table>
+</div>
                   )}
                 </div>
               </div>
