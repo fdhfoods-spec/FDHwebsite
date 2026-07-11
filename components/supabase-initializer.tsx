@@ -98,7 +98,7 @@ export function SupabaseInitializer() {
           const metadata = session.user.user_metadata || {}
           const userPhone = session.user.phone || metadata.phone || ''
           let userRole = 'customer'
-          let userName = metadata.name || userPhone || 'Verified Customer'
+          let userName = metadata.name || ''
 
           if (userPhone) {
             const { data: dbUser } = await supabase

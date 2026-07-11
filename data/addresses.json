@@ -13,6 +13,12 @@
       "title": "Address 1",
       "details": "krishnagriri",
       "isDefault": true
+    },
+    {
+      "id": "df9dfb13-d703-4f1c-a7e1-c572b97df881",
+      "title": "Address NaN",
+      "details": "kannandahalli\n",
+      "isDefault": false
     }
   ]
 }

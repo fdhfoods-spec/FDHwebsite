@@ -45,7 +45,7 @@ import {
   XCircle,
   Menu
 } from 'lucide-react'
-import { useStore, type Product, type Order, type Banner, type DeliveryPartner } from '@/lib/store'
+import { useStore, type Product, type Order, type Banner, type DeliveryPartner, ALL_TIME_SLOTS } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { EnterpriseInventory } from '@/components/admin-inventory'
 import { CustomerManagement } from '@/components/admin-customers'
@@ -994,6 +994,7 @@ export default function AdminDashboardPage() {
                       <th className="p-4">Offer Price</th>
                       <th className="p-4">Original Price</th>
                       <th className="p-4">Badge Text</th>
+                      <th className="p-4">Available Slots</th>
                       <th className="p-4 text-center">Actions</th>
                     </tr>
                   </thead>
@@ -1083,6 +1084,31 @@ export default function AdminDashboardPage() {
                             className="px-3 py-1 rounded w-32 font-bold outline-none"
                             style={{background: '#f5f0e8', border: '1px solid #e5e0d5', color: '#d4a574'}}
                           />
+                        </td>
+                        <td className="p-4">
+                          <div className="flex flex-col gap-1 max-h-24 overflow-y-auto pr-2 custom-scrollbar min-w-[120px]">
+                            {ALL_TIME_SLOTS.map(slot => (
+                              <label key={slot.label} className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-600 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  className="rounded border-gray-300 text-secondary focus:ring-secondary"
+                                  checked={p.availableSlots?.includes(slot.label) || false}
+                                  onChange={(e) => {
+                                    const current = p.availableSlots || [];
+                                    if (e.target.checked) {
+                                      updateProduct(p.id, { availableSlots: [...current, slot.label] });
+                                    } else {
+                                      updateProduct(p.id, { availableSlots: current.filter(s => s !== slot.label) });
+                                    }
+                                  }}
+                                />
+                                {slot.label}
+                              </label>
+                            ))}
+                            <span className="text-[9px] text-gray-400 mt-1 italic">
+                              {!p.availableSlots?.length ? "Normal (All Slots)" : "Restricted Slots"}
+                            </span>
+                          </div>
                         </td>
                         <td className="p-4 text-center">
                           <button
@@ -1641,6 +1667,35 @@ export default function AdminDashboardPage() {
                         }}
                       />
                     </label>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[9px] uppercase font-bold text-slate-400 flex justify-between">
+                    <span>Restricted Delivery Slots (Optional)</span>
+                    <span className="text-slate-500 font-normal normal-case">Leave empty for normal product</span>
+                  </label>
+                  <div className="bg-slate-950 border border-slate-850 rounded-xl p-3 max-h-40 overflow-y-auto custom-scrollbar">
+                    <div className="flex flex-col gap-2">
+                      {ALL_TIME_SLOTS.map(slot => (
+                        <label key={slot.label} className="flex items-center gap-2 text-xs font-semibold text-slate-300 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="rounded border-slate-700 bg-slate-900 text-secondary focus:ring-secondary focus:ring-offset-slate-950"
+                            checked={newProduct.availableSlots?.includes(slot.label) || false}
+                            onChange={(e) => {
+                              const current = newProduct.availableSlots || [];
+                              if (e.target.checked) {
+                                setNewProduct({ ...newProduct, availableSlots: [...current, slot.label] });
+                              } else {
+                                setNewProduct({ ...newProduct, availableSlots: current.filter(s => s !== slot.label) });
+                              }
+                            }}
+                          />
+                          {slot.label}
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

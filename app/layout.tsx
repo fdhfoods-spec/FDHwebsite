@@ -1,8 +1,23 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
+import { Inter, Manrope } from 'next/font/google'
 import './globals.css'
 import { SupabaseInitializer } from '@/components/supabase-initializer'
 import { StructuredData } from '@/components/structured-data'
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+  variable: '--font-inter',
+})
+
+const manrope = Manrope({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-manrope',
+})
 
 export const metadata: Metadata = {
   title: 'Fresh Direct Home (FDH) | Premium Fresh Meat Delivery',
@@ -40,7 +55,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-background scroll-smooth">
+    <html lang="en" className={`${inter.variable} ${manrope.variable} bg-background scroll-smooth`}>
       <head>
         <StructuredData />
       </head>

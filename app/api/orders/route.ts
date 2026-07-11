@@ -89,7 +89,12 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true })
   } catch (err: any) {
-    console.error('Server error creating order:', err)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    const isMock = supabaseUrl?.includes('fdh-supabase-project.supabase.co')
+    if (isMock && (err.message?.includes('fetch failed') || err.message?.includes('Failed to fetch') || err.message?.includes('getaddrinfo') || err.message?.includes('ENOTFOUND'))) {
+      console.warn('Server warning: Skipped database insert for mock domain placeholder:', err.message || err)
+    } else {
+      console.error('Server error creating order:', err)
+    }
+    return NextResponse.json({ error: err.message || String(err) }, { status: 500 })
   }
 }

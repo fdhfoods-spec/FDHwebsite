@@ -41,8 +41,10 @@ export default function UserProfilePage() {
 
   useEffect(() => {
     if (user) {
-      setProfileName(user.name || '')
-      setProfileEmail(user.email || '')
+      const nameVal = user.name && user.name !== 'Verified Customer' ? user.name : ''
+      const emailVal = user.email && !user.email.includes('@placeholder') && !user.email.includes('example.com') ? user.email : ''
+      setProfileName(nameVal)
+      setProfileEmail(emailVal)
     }
   }, [user])
   

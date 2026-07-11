@@ -10,6 +10,7 @@ export interface CartItem {
   qty: number
   vendorId?: string
   vendorName?: string
+  availableSlots?: string[]
 }
 
 export interface Product {
@@ -35,7 +36,16 @@ export interface Product {
   variants?: ProductVariant[]
   description?: string
   tags?: string[]
+  availableSlots?: string[]
 }
+
+export const ALL_TIME_SLOTS = [
+  { label: '07:00 AM - 10:00 AM', endHour: 10 },
+  { label: '10:00 AM - 01:00 PM', endHour: 13 },
+  { label: '01:00 PM - 04:00 PM', endHour: 16 },
+  { label: '04:00 PM - 07:00 PM', endHour: 19 },
+  { label: '07:00 PM - 10:00 PM', endHour: 22 },
+]
 
 export type OrderStatus =
   | 'pending'
@@ -1518,29 +1528,39 @@ export const useStore = create<HomepageState>((set) => ({
         }
       }
 
-      if (isSupabaseConfigured() && supabase) {
-        const rawPayload = mapOrderToDb(order)
-        const cleanPayload: any = {}
-        Object.keys(rawPayload).forEach(k => {
-          if (rawPayload[k] !== undefined && rawPayload[k] !== null) cleanPayload[k] = rawPayload[k]
-        })
+      const rawPayload = mapOrderToDb(order)
+      const cleanPayload: any = {}
+      Object.keys(rawPayload).forEach(k => {
+        if (rawPayload[k] !== undefined && rawPayload[k] !== null) cleanPayload[k] = rawPayload[k]
+      })
 
-        // Use the secure backend API route to bypass RLS and handle inserts
-        fetch('/api/orders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(cleanPayload)
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.error) {
-              console.error('[Supabase API Insert Error]', data.error)
+      // Use the secure backend API route to bypass RLS and handle inserts
+      fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cleanPayload)
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            const isMockUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('fdh-supabase-project.supabase.co');
+            if (isMockUrl && (data.error.includes('fetch failed') || data.error.includes('Failed to fetch') || data.error.includes('ENOTFOUND'))) {
+              console.warn('[Supabase API Insert Warning] Mock domain database insert skipped.', data.error)
             } else {
-              console.log('[Supabase API Insert Success] Order saved successfully!')
+              console.error('[Supabase API Insert Error]', data.error)
             }
-          })
-          .catch(err => console.error('[Supabase API Error]', err))
-      }
+          } else {
+            console.log('[Supabase API Insert Success] Order saved successfully!')
+          }
+        })
+        .catch(err => {
+          const isMockUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('fdh-supabase-project.supabase.co');
+          if (isMockUrl) {
+            console.warn('[Supabase API Warning] Fetch failed for mock domain:', err.message || err)
+          } else {
+            console.error('[Supabase API Error]', err)
+          }
+        })
       return {
         orders: newOrders,
       }

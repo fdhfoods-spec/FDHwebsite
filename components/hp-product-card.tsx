@@ -11,6 +11,7 @@ interface HpProductCardProps {
   rating: number
   reviews: number
   badge?: string
+  availableSlots?: string[]
 }
 
 export function HpProductCard({
@@ -22,6 +23,7 @@ export function HpProductCard({
   rating,
   reviews,
   badge,
+  availableSlots,
 }: HpProductCardProps) {
   const { items, addItem, updateQty, removeItem, setIsCartOpen, setCartStep } = useStore()
 
@@ -37,6 +39,7 @@ export function HpProductCard({
       rating,
       reviews,
       badge,
+      availableSlots,
     })
     setIsCartOpen(true)
     setCartStep('cart')
@@ -81,6 +84,12 @@ export function HpProductCard({
           {category}
         </p>
         <h3 className="font-bold text-primary mb-2 line-clamp-2">{name}</h3>
+
+        {availableSlots && availableSlots.length > 0 && (
+          <div className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 rounded px-2 py-1 mb-3 inline-block leading-tight">
+             📍 Slots: {availableSlots.join(', ')}
+          </div>
+        )}
 
         {/* Rating */}
         <div className="flex items-center gap-2 mb-4">

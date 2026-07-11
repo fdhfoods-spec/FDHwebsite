@@ -78,7 +78,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       badge: product.badge,
       image: product.image,
       vendorId: product.vendorId,
-      vendorName: product.vendorName
+      vendorName: product.vendorName,
+      availableSlots: product.availableSlots,
     })
   }
 
@@ -266,8 +267,16 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
             {/* Trust Badges */}
             <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-850 text-xs text-slate-400">
-              <div className="flex items-center gap-2">
-                <Truck className="w-4 h-4 text-emerald-400 shrink-0" /> Express 90-Min Delivery
+              <div className="flex items-center gap-2 col-span-2 sm:col-span-1">
+                {product?.availableSlots && product.availableSlots.length > 0 ? (
+                  <span className="flex items-center gap-2 text-amber-400 font-bold">
+                    <Clock className="w-4 h-4 shrink-0" /> Slots: {product.availableSlots.join(', ')}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Truck className="w-4 h-4 text-emerald-400 shrink-0" /> Express 90-Min Delivery
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0" /> FSSAI Certified 100% Fresh

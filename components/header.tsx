@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ShoppingCart, User, LogOut, Plus, Minus, Trash2, ShieldCheck, MapPin, Search, ChevronDown, Check, ArrowLeft, CreditCard, Banknote, ShieldAlert, CheckCircle, MessageSquare, Smartphone, RefreshCw } from 'lucide-react'
+import { Menu, X, ShoppingCart, User, LogOut, Plus, Minus, Trash2, ShieldCheck, MapPin, Search, ChevronDown, Check, ArrowLeft, CreditCard, Banknote, ShieldAlert, CheckCircle, XCircle, MessageSquare, Smartphone, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useStore, type Product } from '@/lib/store'
 import { LOCATIONS } from '@/lib/locations'
@@ -86,62 +86,43 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isLocationOpen, setIsLocationOpen] = useState(false)
   const [isSearchPanelOpen, setIsSearchPanelOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState<string>('')
+  const [pincode, setPincode] = useState('')
+  const [pincodeFeedback, setPincodeFeedback] = useState('')
+  const [pincodeFeedbackType, setPincodeFeedbackType] = useState<'success' | 'error' | ''>('')
+  const [isPincodeModalOpen, setIsPincodeModalOpen] = useState(false)
 
-  const handleScrollToSection = (sectionId: string) => {
-    const el = document.getElementById(sectionId)
-    if (el) {
-      const headerOffset = 90 // sticky header offset
-      const elementPosition = el.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      })
+  const handlePincodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const cleanPin = pincode.trim()
+    if (!cleanPin) {
+      setPincodeFeedback('Please enter your pincode')
+      setPincodeFeedbackType('error')
+      setIsPincodeModalOpen(true)
+      return
+    }
+    if (!/^\d+$/.test(cleanPin) || cleanPin.length !== 6) {
+      setPincodeFeedback('Invalid pincode')
+      setPincodeFeedbackType('error')
+      setIsPincodeModalOpen(true)
+      return
+    }
+    if (cleanPin === '635001') {
+      setPincodeFeedback('Delivery is available in your location.')
+      setPincodeFeedbackType('success')
+      setSelectedLocation('635001')
+      setIsPincodeModalOpen(true)
+    } else {
+      setPincodeFeedback('Currently not available in your location.')
+      setPincodeFeedbackType('error')
+      setIsPincodeModalOpen(true)
     }
   }
 
   useEffect(() => {
-    if (pathname !== '/') {
-      setActiveSection('')
-      return
+    if (selectedLocation && /^\d{6}$/.test(selectedLocation)) {
+      setPincode(selectedLocation)
     }
-
-    const sections = ['products', 'why-fdh', 'how-it-works', 'quality', 'faq']
-    
-    const handleScrollActive = () => {
-      const scrollPosition = window.scrollY + 120
-
-      let currentSection = ''
-      for (const sectionId of sections) {
-        const el = document.getElementById(sectionId)
-        if (el) {
-          const top = el.offsetTop
-          const height = el.offsetHeight
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            currentSection = sectionId
-            break
-          }
-        }
-      }
-      
-      if (window.scrollY < 100) {
-        currentSection = ''
-      }
-      
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50) {
-        currentSection = 'faq'
-      }
-
-      setActiveSection(currentSection)
-    }
-
-    window.addEventListener('scroll', handleScrollActive)
-    handleScrollActive()
-
-    return () => window.removeEventListener('scroll', handleScrollActive)
-  }, [pathname])
+  }, [selectedLocation])
 
   // Location selection and search states
   const [selectedState, setSelectedState] = useState<string | null>(null)
@@ -194,19 +175,116 @@ export function Header() {
     )
   }
 
+  const configuredSlots = useMemo(() => {
+    let slotsList: any[] = []
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('fdh_delivery_slots')
+      if (saved) {
+        try {
+          slotsList = JSON.parse(saved)
+        } catch (e) {
+          console.error(e)
+        }
+      } else {
+        // Default initial slots from time slot manager
+        slotsList = [
+          { id: 'SLOT-1', slotTime: '07:00 AM - 10:00 AM', maxCapacity: 20, currentBookings: 8, isActive: true },
+          { id: 'SLOT-2', slotTime: '10:00 AM - 01:00 PM', maxCapacity: 25, currentBookings: 14, isActive: true },
+          { id: 'SLOT-3', slotTime: '01:00 PM - 04:00 PM', maxCapacity: 20, currentBookings: 5, isActive: true },
+          { id: 'SLOT-4', slotTime: '04:00 PM - 07:00 PM', maxCapacity: 30, currentBookings: 19, isActive: true },
+          { id: 'SLOT-5', slotTime: '07:00 PM - 10:00 PM', maxCapacity: 15, currentBookings: 12, isActive: false }
+        ]
+      }
+    }
+    // Filter only active slots
+    return slotsList
+      .filter((s: any) => s.isActive && s.slotTime)
+      .map((s: any) => {
+        const label = s.slotTime
+        let endHour = 24
+        const parts = label.split('-')
+        if (parts.length === 2) {
+          const endPart = parts[1].trim()
+          const timeParts = endPart.split(' ')
+          if (timeParts.length === 2) {
+            const hourMin = timeParts[0].split(':')
+            const meridiem = timeParts[1].toUpperCase()
+            let hour = parseInt(hourMin[0], 10)
+            if (meridiem === 'PM' && hour !== 12) hour += 12
+            if (meridiem === 'AM' && hour === 12) hour = 0
+            endHour = hour
+          }
+        }
+        return { label, endHour }
+      })
+  }, [isCartOpen, cartStep])
+
+  const cartProductSlots = useMemo(() => {
+    const slots = new Set<string>()
+    items.forEach((item) => {
+      if (item.availableSlots && Array.isArray(item.availableSlots)) {
+        item.availableSlots.forEach((s) => {
+          if (s && s.trim()) slots.add(s.trim())
+        })
+      }
+    })
+    return Array.from(slots)
+  }, [items])
+
+  const isMixedCart = useMemo(() => {
+    const hasFixed = items.some((item) => item.availableSlots && item.availableSlots.length > 0)
+    const hasNonFixed = items.some((item) => !item.availableSlots || item.availableSlots.length === 0)
+    return hasFixed && hasNonFixed
+  }, [items])
+
+  const itemsWithFixedSlots = useMemo(() => {
+    return items.filter((item) => item.availableSlots && item.availableSlots.length > 0)
+  }, [items])
+
+  const hasDifferentSlots = useMemo(() => {
+    if (itemsWithFixedSlots.length <= 1) return false
+    const firstItemSlots = JSON.stringify(itemsWithFixedSlots[0].availableSlots?.slice().sort())
+    return itemsWithFixedSlots.some(item => JSON.stringify(item.availableSlots?.slice().sort()) !== firstItemSlots)
+  }, [itemsWithFixedSlots])
+
+  const cartProductSlotsMapped = useMemo(() => {
+    return cartProductSlots.map((s) => {
+      let endHour = 24
+      const parts = s.split('-')
+      if (parts.length === 2) {
+        const endPart = parts[1].trim()
+        const timeParts = endPart.split(' ')
+        if (timeParts.length === 2) {
+          const hourMin = timeParts[0].split(':')
+          const meridiem = timeParts[1].toUpperCase()
+          let hour = parseInt(hourMin[0], 10)
+          if (meridiem === 'PM' && hour !== 12) hour += 12
+          if (meridiem === 'AM' && hour === 12) hour = 0
+          endHour = hour
+        }
+      }
+      return { label: s, endHour }
+    })
+  }, [cartProductSlots])
+
   const availableSlots = useMemo(() => {
+    const slotsToUse = cartProductSlots.length > 0 ? cartProductSlotsMapped : configuredSlots
+    if (slotsToUse.length === 0) return []
+
     if (!isTodaySelected()) {
-      return ALL_TIME_SLOTS
+      return slotsToUse
     }
     const now = new Date()
     const currentHour = now.getHours()
     const currentMinutes = now.getMinutes()
     const currentDecimalHour = currentHour + currentMinutes / 60
-    return ALL_TIME_SLOTS.filter(slot => slot.endHour > currentDecimalHour)
-  }, [scheduledDate, isCartOpen])
+    return slotsToUse.filter(slot => slot.endHour > currentDecimalHour)
+  }, [scheduledDate, isCartOpen, configuredSlots, cartProductSlots, cartProductSlotsMapped])
 
   // Auto-validate and select first slot if current slot is invalid/expired
   useEffect(() => {
+    if (hasDifferentSlots) return
+
     if (availableSlots.length > 0) {
       const isCurrentValid = availableSlots.some(s => s.label === scheduledSlot)
       if (!isCurrentValid) {
@@ -217,7 +295,24 @@ export function Header() {
         setScheduledSlot('')
       }
     }
-  }, [availableSlots, scheduledSlot])
+  }, [availableSlots, scheduledSlot, hasDifferentSlots])
+
+  useEffect(() => {
+    if (hasDifferentSlots) {
+      const summary = itemsWithFixedSlots.map(item => `${item.name} (${item.availableSlots?.join(', ')})`).join(' | ')
+      setScheduledSlot(summary)
+    }
+  }, [hasDifferentSlots, itemsWithFixedSlots])
+
+  useEffect(() => {
+    if (cartStep === 'checkout') {
+      if (cartProductSlots.length > 0) {
+        setDeliveryType('scheduled')
+      } else {
+        setDeliveryType('immediate')
+      }
+    }
+  }, [cartStep, cartProductSlots])
 
   useEffect(() => {
     const tomorrow = new Date()
@@ -746,74 +841,6 @@ export function Header() {
     setScheduledSlot('Morning 8 AM - 11 AM')
   }
 
-  const navLinks = [
-    { 
-      name: 'Products', 
-      href: '/#products', 
-      sectionId: 'products',
-      onClick: (e: any) => {
-        e.preventDefault()
-        if (pathname === '/') {
-          handleScrollToSection('products')
-        } else {
-          router.push('/#products')
-        }
-      }
-    },
-    { 
-      name: 'Why FDH', 
-      href: '/#why-fdh', 
-      sectionId: 'why-fdh',
-      onClick: (e: any) => {
-        e.preventDefault()
-        if (pathname === '/') {
-          handleScrollToSection('why-fdh')
-        } else {
-          router.push('/#why-fdh')
-        }
-      }
-    },
-    { 
-      name: 'How It Works', 
-      href: '/#how-it-works', 
-      sectionId: 'how-it-works',
-      onClick: (e: any) => {
-        e.preventDefault()
-        if (pathname === '/') {
-          handleScrollToSection('how-it-works')
-        } else {
-          router.push('/#how-it-works')
-        }
-      }
-    },
-    { 
-      name: 'Quality', 
-      href: '/#quality', 
-      sectionId: 'quality',
-      onClick: (e: any) => {
-        e.preventDefault()
-        if (pathname === '/') {
-          handleScrollToSection('quality')
-        } else {
-          router.push('/#quality')
-        }
-      }
-    },
-    { 
-      name: 'FAQ', 
-      href: '/#faq', 
-      sectionId: 'faq',
-      onClick: (e: any) => {
-        e.preventDefault()
-        if (pathname === '/') {
-          handleScrollToSection('faq')
-        } else {
-          router.push('/#faq')
-        }
-      }
-    },
-  ]
-
   return (
     <>
       <motion.header
@@ -842,157 +869,30 @@ export function Header() {
               </div>
             </Link>
 
-            {/* Location Selector (Desktop) */}
+            {/* Pincode Input (Desktop) */}
             <div className="hidden lg:relative lg:block" ref={desktopLocationRef}>
-              <button
-                onClick={() => {
-                  setIsLocationOpen(!isLocationOpen)
-                  setSelectedState(null)
-                  setLocationSearchQuery('')
-                }}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-full hover:bg-gray-50 border border-gray-100 text-xs font-semibold text-foreground/80 hover:text-primary transition-all duration-200"
-              >
-                <MapPin className="w-3.5 h-3.5 text-secondary" />
-                <span>{String(selectedLocation || 'Location')}</span>
-                <ChevronDown className={`w-3 h-3 text-foreground/45 transition-transform duration-200 ${isLocationOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {isLocationOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute left-0 mt-2 w-72 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 py-3 overflow-hidden flex flex-col"
+              <form onSubmit={handlePincodeSubmit} className="relative flex items-center">
+                <div className="relative">
+                  <MapPin className="w-3.5 h-3.5 text-secondary absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Enter your pincode"
+                    value={pincode}
+                    onChange={(e) => {
+                      setPincode(e.target.value)
+                      setPincodeFeedback('')
+                      setPincodeFeedbackType('')
+                    }}
+                    className="pl-8 pr-16 py-2 border border-gray-200 focus:border-primary/45 focus:ring-1 focus:ring-primary/20 rounded-full bg-gray-50/50 hover:bg-gray-50 text-xs font-medium outline-none transition-all duration-200 w-48"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-primary hover:text-secondary px-2.5 py-1 bg-white border border-gray-150 rounded-full shadow-sm hover:shadow transition-all"
                   >
-                    {/* Location Search Input */}
-                    <div className="px-3 pb-2.5">
-                      <div className="relative">
-                        <Search className="w-3.5 h-3.5 text-foreground/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="text"
-                          placeholder="Search state or district..."
-                          value={locationSearchQuery}
-                          onChange={(e) => setLocationSearchQuery(e.target.value)}
-                          className="w-full pl-8 pr-3 py-1.5 bg-gray-50/50 hover:bg-gray-50 focus:bg-white border border-gray-200 rounded-lg text-xs outline-none focus:border-primary/45 transition-colors"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Search Results vs Standard Navigation */}
-                    {locationSearchQuery.trim() !== '' ? (
-                      <div className="max-h-56 overflow-y-auto px-1 space-y-0.5">
-                        <p className="px-3.5 py-1 text-[8px] uppercase font-extrabold text-foreground/40 tracking-wider">
-                          Search Results
-                        </p>
-                        {locationSearchResults.length === 0 ? (
-                          <div className="px-3.5 py-4 text-center text-xs text-foreground/40">
-                            No locations found
-                          </div>
-                        ) : (
-                          locationSearchResults.map((res) => {
-                            const fullLocString = `${res.district}, ${res.state}`
-                            return (
-                              <button
-                                key={fullLocString}
-                                onClick={() => {
-                                  setSelectedLocation(fullLocString)
-                                  setIsLocationOpen(false)
-                                  setLocationSearchQuery('')
-                                  setSelectedState(null)
-                                }}
-                                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold hover:bg-primary/5 hover:text-primary transition-colors flex items-center justify-between ${selectedLocation === fullLocString ? 'text-primary bg-primary/5' : 'text-foreground/75'
-                                  }`}
-                              >
-                                <span>{res.district}</span>
-                                <span className="text-[9px] text-foreground/40 font-bold uppercase">{res.state}</span>
-                              </button>
-                            )
-                          })
-                        )}
-                      </div>
-                    ) : !selectedState ? (
-                      <>
-                        {savedAddresses.length > 0 && (
-                          <div className="mb-2">
-                            <p className="px-4 py-1 text-[8px] uppercase font-bold text-foreground/40 tracking-wider">
-                              Saved Addresses
-                            </p>
-                            <div className="mt-1 max-h-32 overflow-y-auto border-b border-gray-100 pb-2">
-                              {savedAddresses.map((addr, idx) => (
-                                <button
-                                  key={idx}
-                                  onClick={() => {
-                                    setSelectedLocation(addr.title)
-                                    setIsLocationOpen(false)
-                                    setLocationSearchQuery('')
-                                    setSelectedState(null)
-                                  }}
-                                  className={`w-full text-left px-4 py-2 text-xs font-semibold hover:bg-primary/5 hover:text-primary transition-all duration-200 flex flex-col gap-0.5 ${selectedLocation === addr.title ? 'text-primary bg-primary/5' : 'text-foreground/70'}`}
-                                >
-                                  <span className="flex items-center gap-1.5">
-                                    {addr.title}
-                                    {addr.isDefault && <span className="text-[8px] bg-secondary/10 text-secondary px-1.5 py-0.5 rounded uppercase font-bold leading-none">Default</span>}
-                                  </span>
-                                  <span className="text-[9px] text-foreground/40 font-medium truncate w-full">{addr.details}</span>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        <p className="px-4 py-1 text-[8px] uppercase font-bold text-foreground/40 tracking-wider">
-                          Select State
-                        </p>
-                        <div className="mt-1 max-h-48 overflow-y-auto">
-                          {Object.keys(LOCATIONS).map((state) => (
-                            <button
-                              key={state}
-                              onClick={() => setSelectedState(state)}
-                              className="w-full text-left px-4 py-2 text-xs font-semibold text-foreground/70 hover:text-primary hover:bg-primary/5 transition-all duration-200 flex items-center justify-between"
-                            >
-                              <span>{state}</span>
-                              <ChevronDown className="-rotate-90 w-3.5 h-3.5 text-foreground/35" />
-                            </button>
-                          ))}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex items-center gap-1.5 px-3 pb-2 border-b border-gray-100">
-                          <button
-                            onClick={() => setSelectedState(null)}
-                            className="p-1 hover:bg-muted rounded-full text-foreground/50 hover:text-primary transition-colors"
-                          >
-                            <ArrowLeft className="w-4 h-4" />
-                          </button>
-                          <span className="text-[10px] uppercase font-extrabold text-foreground/40 tracking-wider">
-                            Districts in {selectedState}
-                          </span>
-                        </div>
-                        <div className="mt-1.5 max-h-52 overflow-y-auto">
-                          {(LOCATIONS[selectedState] || []).map((district) => {
-                            const fullLocString = `${district}, ${selectedState}`
-                            return (
-                              <button
-                                key={district}
-                                onClick={() => {
-                                  setSelectedLocation(fullLocString)
-                                  setIsLocationOpen(false)
-                                  setSelectedState(null)
-                                }}
-                                className={`w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-muted/40 transition-colors ${selectedLocation === fullLocString ? 'text-primary bg-primary/5 font-semibold' : 'text-foreground/70'
-                                  }`}
-                              >
-                                {district}
-                              </button>
-                            )
-                          })}
-                        </div>
-                      </>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    Check
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
 
@@ -1024,177 +924,32 @@ export function Header() {
             {/* Suggestions Panel removed as SearchOverlay takes over */}
           </div>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden xl:flex items-center gap-6">
-            {navLinks.map((link) => {
-              const isActive = pathname === '/' 
-                ? activeSection === link.sectionId
-                : pathname === link.href
-              return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={link.onClick}
-                  className={`relative font-sans text-xs font-semibold tracking-wide transition-colors py-2 group ${
-                    isActive ? 'text-primary' : 'text-foreground/80 hover:text-primary'
-                  }`}
-                >
-                  {link.name}
-                  <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-primary transition-transform origin-left duration-300 ${
-                    isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
-                  }`} />
-                </Link>
-              )
-            })}
-          </nav>
-
           {/* Actions Panel */}
           <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-            {/* Location Selector (Mobile) */}
+            {/* Pincode Input (Mobile) */}
             <div className="lg:hidden relative" ref={mobileLocationRef}>
-              <button
-                onClick={() => {
-                  setIsLocationOpen(!isLocationOpen)
-                  setSelectedState(null)
-                  setLocationSearchQuery('')
-                }}
-                className="p-2 hover:bg-primary/5 rounded-full transition-colors flex items-center gap-1 text-foreground/70"
-                aria-label="Select location"
-              >
-                <MapPin className="w-5 h-5 text-secondary" />
-                <span className="text-[10px] font-bold hidden sm:inline">{String(selectedLocation || 'Location').split(',')[0]}</span>
-              </button>
-
-              <AnimatePresence>
-                {isLocationOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-2.5 overflow-hidden flex flex-col"
+              <form onSubmit={handlePincodeSubmit} className="relative flex items-center">
+                <div className="relative">
+                  <MapPin className="w-3.5 h-3.5 text-secondary absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Enter pincode"
+                    value={pincode}
+                    onChange={(e) => {
+                      setPincode(e.target.value)
+                      setPincodeFeedback('')
+                      setPincodeFeedbackType('')
+                    }}
+                    className="pl-7 pr-12 py-1.5 border border-gray-200 focus:border-primary/45 focus:ring-1 focus:ring-primary/20 rounded-full bg-gray-50/50 hover:bg-gray-50 text-[10px] font-medium outline-none transition-all duration-200 w-36"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] font-bold text-primary hover:text-secondary px-1.5 py-0.5 bg-white border border-gray-150 rounded-full shadow-sm hover:shadow transition-all"
                   >
-                    {/* Location Search Input for mobile */}
-                    <div className="px-3 pb-2">
-                      <div className="relative">
-                        <Search className="w-3.5 h-3.5 text-foreground/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="text"
-                          placeholder="Search state or district..."
-                          value={locationSearchQuery}
-                          onChange={(e) => setLocationSearchQuery(e.target.value)}
-                          className="w-full pl-8 pr-3 py-1 bg-gray-50 border border-gray-200 rounded-lg text-xs outline-none focus:border-primary/45"
-                        />
-                      </div>
-                    </div>
-
-                    {locationSearchQuery.trim() !== '' ? (
-                      <div className="max-h-52 overflow-y-auto px-1 space-y-0.5">
-                        {locationSearchResults.length === 0 ? (
-                          <div className="px-3 py-4 text-center text-xs text-foreground/45">
-                            No locations found
-                          </div>
-                        ) : (
-                          locationSearchResults.map((res) => {
-                            const fullLocString = `${res.district}, ${res.state}`
-                            return (
-                              <button
-                                key={fullLocString}
-                                onClick={() => {
-                                  setSelectedLocation(fullLocString)
-                                  setIsLocationOpen(false)
-                                  setLocationSearchQuery('')
-                                  setSelectedState(null)
-                                }}
-                                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold hover:bg-primary/5 hover:text-primary transition-colors flex items-center justify-between ${selectedLocation === fullLocString ? 'text-primary bg-primary/5' : 'text-foreground/75'
-                                  }`}
-                              >
-                                <span>{res.district}</span>
-                                <span className="text-[8px] text-foreground/40 font-bold uppercase">{res.state}</span>
-                              </button>
-                            )
-                          })
-                        )}
-                      </div>
-                    ) : !selectedState ? (
-                      <>
-                        {savedAddresses.length > 0 && (
-                          <div className="mb-2">
-                            <p className="px-3.5 py-1 text-[8px] uppercase font-bold text-foreground/45 tracking-wider">
-                              Saved Addresses
-                            </p>
-                            <div className="mt-1 max-h-32 overflow-y-auto border-b border-gray-100 pb-2">
-                              {savedAddresses.map((addr, idx) => (
-                                <button
-                                  key={idx}
-                                  onClick={() => {
-                                    setSelectedLocation(addr.title)
-                                    setIsLocationOpen(false)
-                                    setLocationSearchQuery('')
-                                    setSelectedState(null)
-                                  }}
-                                  className={`w-full text-left px-4 py-2 text-xs font-semibold hover:bg-primary/5 hover:text-primary transition-all flex flex-col gap-0.5 ${selectedLocation === addr.title ? 'text-primary bg-primary/5' : 'text-foreground/70'}`}
-                                >
-                                  <span className="flex items-center gap-1.5">
-                                    {addr.title}
-                                    {addr.isDefault && <span className="text-[8px] bg-secondary/10 text-secondary px-1.5 py-0.5 rounded uppercase font-bold leading-none">Default</span>}
-                                  </span>
-                                  <span className="text-[9px] text-foreground/40 font-medium truncate w-full">{addr.details}</span>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        <p className="px-3.5 py-1 text-[8px] uppercase font-bold text-foreground/45 tracking-wider">
-                          Select State
-                        </p>
-                        {Object.keys(LOCATIONS).map((state) => (
-                          <button
-                            key={state}
-                            onClick={() => setSelectedState(state)}
-                            className="w-full text-left px-4 py-2 text-xs font-semibold text-foreground/70 hover:bg-primary/5 hover:text-primary transition-all flex items-center justify-between"
-                          >
-                            <span>{state}</span>
-                            <ChevronDown className="-rotate-90 w-3 h-3 text-foreground/40" />
-                          </button>
-                        ))}
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex items-center gap-1.5 px-2.5 pb-2 border-b border-gray-100">
-                          <button
-                            onClick={() => setSelectedState(null)}
-                            className="p-0.5 hover:bg-muted rounded text-foreground/50"
-                          >
-                            <ArrowLeft className="w-3.5 h-3.5" />
-                          </button>
-                          <span className="text-[8px] uppercase font-extrabold text-foreground/40">
-                            {selectedState}
-                          </span>
-                        </div>
-                        <div className="max-h-52 overflow-y-auto">
-                          {(LOCATIONS[selectedState] || []).map((district) => {
-                            const fullLocString = `${district}, ${selectedState}`
-                            return (
-                              <button
-                                key={district}
-                                onClick={() => {
-                                  setSelectedLocation(fullLocString)
-                                  setIsLocationOpen(false)
-                                  setSelectedState(null)
-                                }}
-                                className={`w-full text-left px-4 py-2 text-xs font-medium hover:bg-muted/40 transition-colors ${selectedLocation === fullLocString ? 'text-primary bg-primary/5 font-semibold' : 'text-foreground/70'
-                                  }`}
-                              >
-                                {district}
-                              </button>
-                            )
-                          })}
-                        </div>
-                      </>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    Check
+                  </button>
+                </div>
+              </form>
             </div>
 
             {/* Mobile Search Button */}
@@ -1234,13 +989,16 @@ export function Header() {
               <div className="relative hidden sm:block" ref={profileRef}>
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-gray-50 border border-gray-100 text-xs font-semibold text-primary transition-all duration-200"
+                  className="flex items-center justify-center w-9 h-9 rounded-full bg-secondary/15 border border-secondary/20 hover:bg-secondary/25 transition-all duration-200"
+                  aria-label="User profile menu"
                 >
-                  <div className="w-6 h-6 rounded-full bg-secondary text-white flex items-center justify-center text-[9px] font-extrabold uppercase">
-                    {user.name.slice(0, 2)}
-                  </div>
-                  <span>{user.name}</span>
-                  <ChevronDown className={`w-3.5 h-3.5 text-foreground/45 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
+                  {user.name && user.name !== 'Verified Customer' && user.name.trim() !== '' ? (
+                    <span className="text-secondary font-black text-sm uppercase">
+                      {user.name.trim().charAt(0)}
+                    </span>
+                  ) : (
+                    <User className="w-4 h-4 text-secondary" />
+                  )}
                 </button>
                 <AnimatePresence>
                   {isProfileOpen && (
@@ -1251,10 +1009,16 @@ export function Header() {
                       transition={{ duration: 0.2, ease: 'easeOut' }}
                       className="absolute right-0 mt-2 w-44 bg-white border border-gray-100 rounded-xl shadow-xl py-1 z-50 overflow-hidden"
                     >
+                      <div className="px-4 py-2 border-b border-gray-50 flex flex-col gap-0.5">
+                        <span className="text-[10px] font-bold text-foreground/45 uppercase tracking-wider">Signed in as</span>
+                        <span className="text-xs font-bold text-primary truncate">
+                          {user.name && user.name !== 'Verified Customer' && user.name.trim() !== '' ? user.name : user.phone}
+                        </span>
+                      </div>
                       <Link
                         href="/profile"
                         onClick={() => setIsProfileOpen(false)}
-                        className="w-full text-left px-4 py-2 text-xs font-semibold text-foreground/80 hover:text-primary hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                        className="w-full text-left px-4 py-2.5 text-xs font-semibold text-foreground/80 hover:text-primary hover:bg-gray-50 flex items-center gap-2 transition-colors"
                       >
                         <User className="w-3.5 h-3.5" /> My Profile & Orders
                       </Link>
@@ -1266,7 +1030,7 @@ export function Header() {
                           }
                           setUser(null)
                         }}
-                        className="w-full text-left px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 border-t border-gray-100 flex items-center gap-2 transition-colors"
+                        className="w-full text-left px-4 py-2.5 text-xs font-semibold text-red-600 hover:bg-red-50 border-t border-gray-100 flex items-center gap-2 transition-colors"
                       >
                         <LogOut className="w-3.5 h-3.5" /> Sign Out
                       </button>
@@ -1277,7 +1041,7 @@ export function Header() {
             ) : (
               <Button
                 variant="ghost"
-                onClick={() => router.push('/auth')}
+                onClick={() => setAuthModalOpen(true)}
                 className="hidden sm:flex text-foreground/80 hover:text-primary text-xs font-semibold hover:bg-transparent items-center gap-1"
               >
                 <User className="w-4 h-4" /> Sign In
@@ -1307,54 +1071,25 @@ export function Header() {
             className="xl:hidden border-t border-gray-100 bg-white shadow-inner overflow-hidden"
           >
             <div className="px-4 pt-4 pb-6 space-y-4">
-              <nav className="flex flex-col gap-1">
-                {navLinks.map((link) => {
-                  const isActive = pathname === '/' 
-                    ? activeSection === link.sectionId
-                    : pathname === link.href
-                  return (
-                    <Link
-                      key={link.name}
-                      href={link.href}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setIsMenuOpen(false)
-                        setTimeout(() => {
-                          if (pathname === '/') {
-                            const el = document.getElementById(link.sectionId)
-                            if (el) {
-                              const headerOffset = 90
-                              const offsetPosition = el.getBoundingClientRect().top + window.pageYOffset - headerOffset
-                              window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
-                            }
-                          } else {
-                            router.push(link.href)
-                          }
-                        }, 350) // Wait for menu collapse animation to finish
-                      }}
-                      className={`block px-4 py-3 rounded-lg font-sans font-semibold text-sm transition-colors ${
-                        isActive 
-                          ? 'bg-primary/5 text-primary' 
-                          : 'text-foreground/80 hover:bg-muted/40 hover:text-primary'
-                      }`}
-                    >
-                      {link.name}
-                    </Link>
-                  )
-                })}
-              </nav>
-              <div className="h-px bg-gray-100" />
               <div className="flex flex-col gap-3 px-4">
                 {user ? (
                   <div className="flex flex-col gap-2 p-2.5 bg-muted/40 rounded-xl border border-gray-100">
                     <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between px-1.5 hover:bg-white p-2 rounded-lg transition-colors group">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-secondary text-white flex items-center justify-center text-xs font-extrabold uppercase">
-                          {user.name.slice(0, 2)}
+                        <div className="w-7 h-7 rounded-full bg-secondary/15 border border-secondary/20 flex items-center justify-center">
+                          {user.name && user.name !== 'Verified Customer' && user.name.trim() !== '' ? (
+                            <span className="text-secondary font-black text-xs uppercase">
+                              {user.name.trim().charAt(0)}
+                            </span>
+                          ) : (
+                            <User className="w-3.5 h-3.5 text-secondary" />
+                          )}
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold text-primary group-hover:text-secondary transition-colors">{user.name}</span>
-                          <span className="text-[9px] text-foreground/45 leading-none group-hover:text-foreground/70 transition-colors">{user.email}</span>
+                          <span className="text-xs font-bold text-primary group-hover:text-secondary transition-colors">
+                            {user.name && user.name !== 'Verified Customer' && user.name.trim() !== '' ? user.name : user.phone}
+                          </span>
+                          <span className="text-[9px] text-foreground/45 leading-none group-hover:text-foreground/70 transition-colors">{user.email || 'No email saved'}</span>
                         </div>
                       </div>
                       <ChevronDown className="-rotate-90 w-4 h-4 text-foreground/40 group-hover:text-secondary transition-colors" />
@@ -1666,33 +1401,21 @@ export function Header() {
                       <h4 className="text-[10px] uppercase font-extrabold text-foreground/45 tracking-wider">
                         Delivery Schedule
                       </h4>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setDeliveryType('immediate')}
-                          className={`py-2 px-3 rounded-lg border text-center transition-all text-xs font-bold ${
-                            deliveryType === 'immediate'
-                              ? 'border-secondary bg-secondary/5 text-secondary'
-                              : 'border-gray-200 text-foreground/60 hover:bg-gray-50'
-                          }`}
-                        >
-                          ⚡ Immediate Dispatch
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeliveryType('scheduled')}
-                          className={`py-2 px-3 rounded-lg border text-center transition-all text-xs font-bold ${
-                            deliveryType === 'scheduled'
-                              ? 'border-secondary bg-secondary/5 text-secondary'
-                              : 'border-gray-200 text-foreground/60 hover:bg-gray-50'
-                          }`}
-                        >
-                          📅 Schedule Delivery
-                        </button>
-                      </div>
-
-                      {deliveryType === 'scheduled' && (
-                        <div className="grid grid-cols-2 gap-2 pt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                      {hasDifferentSlots ? (
+                        /* Multiple products with different slots -> Show individual list notice and select date only */
+                        <div className="space-y-3">
+                          <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-[10px] leading-relaxed font-semibold">
+                            <p className="font-bold mb-1">⚠️ Different Delivery Slot Timings:</p>
+                            <p className="text-[9px] mb-1">Your cart contains products with different delivery slots:</p>
+                            <ul className="list-disc pl-3 space-y-0.5">
+                              {itemsWithFixedSlots.map((item) => (
+                                <li key={item.id}>
+                                  <strong>{item.name}</strong> → Delivery slot: {item.availableSlots?.join(', ')}
+                                </li>
+                              ))}
+                            </ul>
+                            <p className="mt-1 text-[9px] font-bold">Each product will follow its configured delivery slot.</p>
+                          </div>
                           <div className="space-y-1">
                             <label className="text-[8px] uppercase font-black text-foreground/50">Select Date</label>
                             <input
@@ -1701,34 +1424,132 @@ export function Header() {
                               min={new Date().toISOString().split('T')[0]}
                               onChange={(e) => setScheduledDate(e.target.value)}
                               className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold outline-none"
-                              required={deliveryType === 'scheduled'}
+                              required
                             />
                           </div>
-                          <div className="space-y-1">
-                            <label className="text-[8px] uppercase font-black text-foreground/50">Time Slot</label>
-                            <select
-                              value={scheduledSlot}
-                              onChange={(e) => setScheduledSlot(e.target.value)}
-                              className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold outline-none"
-                              disabled={availableSlots.length === 0}
-                            >
-                              {availableSlots.length > 0 ? (
-                                availableSlots.map((slot) => (
-                                  <option key={slot.label} value={slot.label}>
-                                    {slot.label}
-                                  </option>
-                                ))
-                              ) : (
-                                <option value="">No Slots Available</option>
-                              )}
-                            </select>
-                          </div>
-                          {availableSlots.length === 0 && (
-                            <p className="text-red-500 text-[8px] font-black uppercase tracking-wide mt-1.5 col-span-2 animate-pulse">
-                              ⚠️ No delivery slots available for today. Please select a future date.
-                            </p>
-                          )}
                         </div>
+                      ) : (
+                        /* Existing single fixed slot or mixed cuts configurations */
+                        <>
+                          {isMixedCart && (
+                            <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-[10px] leading-relaxed font-semibold">
+                              ⚠️ Mixed Order: Your cart contains a combination of regular cuts and fixed-slot items. To accommodate fixed-slot products, your entire order will be scheduled for delivery using the configured slot options.
+                            </div>
+                          )}
+                          {cartProductSlots.length > 0 ? (
+                            /* Product has Fixed Slots -> Force Scheduled, hide Immediate Dispatch option */
+                            <div className="space-y-3">
+                              <div className="text-xs font-bold text-secondary flex items-center gap-1.5 bg-secondary/5 px-3 py-2 rounded-lg border border-secondary/10">
+                                📅 Scheduled Delivery Only
+                              </div>
+                              <div className="grid grid-cols-2 gap-2 pt-1">
+                                <div className="space-y-1">
+                                  <label className="text-[8px] uppercase font-black text-foreground/50">Select Date</label>
+                                  <input
+                                    type="date"
+                                    value={scheduledDate}
+                                    min={new Date().toISOString().split('T')[0]}
+                                    onChange={(e) => setScheduledDate(e.target.value)}
+                                    className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold outline-none"
+                                    required
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[8px] uppercase font-black text-foreground/50">Time Slot</label>
+                                  <select
+                                    value={scheduledSlot}
+                                    onChange={(e) => setScheduledSlot(e.target.value)}
+                                    className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold outline-none"
+                                    disabled={availableSlots.length === 0}
+                                  >
+                                    {availableSlots.length > 0 ? (
+                                      availableSlots.map((slot) => (
+                                        <option key={slot.label} value={slot.label}>
+                                          {slot.label}
+                                        </option>
+                                      ))
+                                    ) : (
+                                      <option value="">No Slots Available</option>
+                                    )}
+                                  </select>
+                                </div>
+                                {availableSlots.length === 0 && (
+                                  <p className="text-red-500 text-[8px] font-black uppercase tracking-wide mt-1.5 col-span-2 animate-pulse">
+                                    ⚠️ No delivery slots available for today. Please select a future date.
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            /* Product does NOT have Fixed Slots -> Show both Immediate Dispatch and Schedule Delivery */
+                            <div className="space-y-3">
+                              <div className="grid grid-cols-2 gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setDeliveryType('immediate')}
+                                  className={`py-2 px-3 rounded-lg border text-center transition-all text-xs font-bold ${
+                                    deliveryType === 'immediate'
+                                      ? 'border-secondary bg-secondary/5 text-secondary'
+                                      : 'border-gray-200 text-foreground/60 hover:bg-gray-50'
+                                  }`}
+                                >
+                                  ⚡ Immediate Dispatch
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setDeliveryType('scheduled')}
+                                  className={`py-2 px-3 rounded-lg border text-center transition-all text-xs font-bold ${
+                                    deliveryType === 'scheduled'
+                                      ? 'border-secondary bg-secondary/5 text-secondary'
+                                      : 'border-gray-200 text-foreground/60 hover:bg-gray-50'
+                                  }`}
+                                >
+                                  📅 Schedule Delivery
+                                </button>
+                              </div>
+
+                              {deliveryType === 'scheduled' && (
+                                <div className="grid grid-cols-2 gap-2 pt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                                  <div className="space-y-1">
+                                    <label className="text-[8px] uppercase font-black text-foreground/50">Select Date</label>
+                                    <input
+                                      type="date"
+                                      value={scheduledDate}
+                                      min={new Date().toISOString().split('T')[0]}
+                                      onChange={(e) => setScheduledDate(e.target.value)}
+                                      className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold outline-none"
+                                      required={deliveryType === 'scheduled'}
+                                    />
+                                  </div>
+                                  <div className="space-y-1">
+                                    <label className="text-[8px] uppercase font-black text-foreground/50">Time Slot</label>
+                                    <select
+                                      value={scheduledSlot}
+                                      onChange={(e) => setScheduledSlot(e.target.value)}
+                                      className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold outline-none"
+                                      disabled={availableSlots.length === 0}
+                                    >
+                                      {availableSlots.length > 0 ? (
+                                        availableSlots.map((slot) => (
+                                          <option key={slot.label} value={slot.label}>
+                                            {slot.label}
+                                          </option>
+                                        ))
+                                      ) : (
+                                        <option value="">No Slots Available</option>
+                                      )}
+                                    </select>
+                                  </div>
+                                  {availableSlots.length === 0 && (
+                                    <p className="text-red-500 text-[8px] font-black uppercase tracking-wide mt-1.5 col-span-2 animate-pulse">
+                                      ⚠️ No delivery slots available for today. Please select a future date.
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
 
@@ -1899,24 +1720,30 @@ export function Header() {
 
                     {/* Submit Button */}
                     <div className="pt-2">
-                      <Button
-                        type="submit"
-                        disabled={isProcessingCheckout || (deliveryType === 'scheduled' && availableSlots.length === 0)}
-                        className="w-full bg-primary hover:bg-primary/95 text-white font-bold text-xs uppercase tracking-widest py-6 rounded-xl flex items-center justify-center gap-1.5 shadow"
-                      >
-                        {isProcessingCheckout ? (
-                          <>
-                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                            Processing Order...
-                          </>
-                        ) : paymentMethod === 'cod' ? (
-                          `Place COD Order (₹${total})`
-                        ) : paymentMethod === 'online' ? (
-                          `Pay & Complete (₹${total})`
-                        ) : (
-                          `Proceed on WhatsApp (₹${total})`
-                        )}
-                      </Button>
+                      {hasDifferentSlots ? (
+                        <div className="p-3.5 bg-rose-50 border border-rose-100 rounded-xl text-center text-xs text-rose-600 font-bold leading-normal">
+                          Your cart contains products with incompatible delivery slots. Please modify your cart to continue.
+                        </div>
+                      ) : (
+                        <Button
+                          type="submit"
+                          disabled={isProcessingCheckout || (deliveryType === 'scheduled' && availableSlots.length === 0)}
+                          className="w-full bg-primary hover:bg-primary/95 text-white font-bold text-xs uppercase tracking-widest py-6 rounded-xl flex items-center justify-center gap-1.5 shadow"
+                        >
+                          {isProcessingCheckout ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              Processing Order...
+                            </>
+                          ) : paymentMethod === 'cod' ? (
+                            `Place COD Order (₹${total})`
+                          ) : paymentMethod === 'online' ? (
+                            `Pay & Complete (₹${total})`
+                          ) : (
+                            `Proceed on WhatsApp (₹${total})`
+                          )}
+                        </Button>
+                      )}
                     </div>
                   </form>
 
@@ -2250,6 +2077,64 @@ export function Header() {
               )}
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+      {/* Pincode Serviceability Modal */}
+      <AnimatePresence>
+        {isPincodeModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsPincodeModalOpen(false)}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/20 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-white/90 backdrop-blur-md border border-white/20 rounded-3xl p-6 shadow-2xl relative text-center space-y-4"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setIsPincodeModalOpen(false)}
+                className="absolute top-4 right-4 text-foreground/45 hover:text-foreground/80 p-1.5 rounded-full hover:bg-gray-50 transition-colors"
+                title="Close popup"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="mx-auto w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm transition-all duration-300">
+                {pincodeFeedbackType === 'success' ? (
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                    <CheckCircle className="w-6 h-6" />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-500">
+                    <XCircle className="w-6 h-6" />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <h3 className="text-xs font-bold text-foreground/40 uppercase tracking-wider">Delivery Serviceability</h3>
+                <p className={`text-sm font-semibold ${
+                  pincodeFeedbackType === 'success' ? 'text-emerald-600' : 'text-red-500'
+                }`}>
+                  {pincodeFeedback}
+                </p>
+              </div>
+
+              <Button
+                onClick={() => setIsPincodeModalOpen(false)}
+                className="w-full py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl text-xs uppercase tracking-wider transition-all"
+              >
+                Close
+              </Button>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
       <SearchOverlay />

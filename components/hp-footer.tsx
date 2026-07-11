@@ -7,23 +7,23 @@ export function HpFooter() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer id="footer" className="bg-primary text-primary-foreground">
+    <footer id="footer" className="bg-[#faf9f7] border-t border-[#e8e4df] text-[#6b6358]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <div className="text-2xl font-bold mb-2">FDH</div>
-            <p className="text-sm text-primary-foreground/80 mb-4">
+            <div className="text-2xl font-bold mb-2 text-[#2d2218]">FDH</div>
+            <p className="text-sm text-[#6b6358] mb-4">
               Fresh Direct Home - Premium meat delivery service.
             </p>
             <div className="flex gap-4">
-              <a href="mailto:hello@fdh.com" className="hover:text-secondary transition-colors" title="Email">
+              <a href="mailto:hello@fdh.com" className="text-[#6b6358] hover:text-secondary transition-colors" title="Email">
                 <Mail className="w-5 h-5" />
               </a>
-              <a href="tel:+1-555-0123" className="hover:text-secondary transition-colors" title="Phone">
+              <a href="tel:+1-555-0123" className="text-[#6b6358] hover:text-secondary transition-colors" title="Phone">
                 <Phone className="w-5 h-5" />
               </a>
-              <a href="/about" className="hover:text-secondary transition-colors" title="Location">
+              <a href="/about" className="text-[#6b6358] hover:text-secondary transition-colors" title="Location">
                 <MapPin className="w-5 h-5" />
               </a>
             </div>
@@ -31,7 +31,7 @@ export function HpFooter() {
 
           {/* Shop Links */}
           <div>
-            <h4 className="font-bold mb-4">Shop</h4>
+            <h4 className="font-bold mb-4 text-[#2d2218]">Shop</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <a 
@@ -118,38 +118,38 @@ export function HpFooter() {
 
           {/* Company Links */}
           <div>
-            <h4 className="font-bold mb-4">Company</h4>
+            <h4 className="font-bold mb-4 text-[#2d2218]">Company</h4>
             <ul className="space-y-2 text-sm">
-              <li><span className="text-primary-foreground">About Us</span></li>
-              <li><span className="text-primary-foreground">Our Suppliers</span></li>
-              <li><span className="text-primary-foreground">Vendor</span></li>
+              <li><span className="text-[#6b6358]">About Us</span></li>
+              <li><span className="text-[#6b6358]">Our Suppliers</span></li>
+              <li><span className="text-[#6b6358]">Vendor</span></li>
               <li><Link href="/profile" className="hover:text-secondary transition-colors">My Account</Link></li>
             </ul>
           </div>
 
           {/* Support Links */}
           <div>
-            <h4 className="font-bold mb-4">Support</h4>
+            <h4 className="font-bold mb-4 text-[#2d2218]">Support</h4>
             <ul className="space-y-2 text-sm">
-              <li><span className="text-primary-foreground">Contact Us</span></li>
+              <li><span className="text-[#6b6358]">Contact Us</span></li>
               <li><Link href="/how-it-works" className="hover:text-secondary transition-colors">How It Works</Link></li>
-              <li><span className="text-primary-foreground">Track Order</span></li>
+              <li><span className="text-[#6b6358]">Track Order</span></li>
               <li><Link href="/profile" className="hover:text-secondary transition-colors">My Orders</Link></li>
             </ul>
           </div>
         </div>
 
         {/* Newsletter */}
-        <div className="bg-primary-foreground/10 p-6 rounded-lg mb-8">
-          <h3 className="font-bold mb-2">Subscribe to Our Newsletter</h3>
-          <p className="text-sm text-primary-foreground/80 mb-4">
+        <div className="bg-[#e8e4df]/40 p-6 rounded-lg mb-8">
+          <h3 className="font-bold mb-2 text-[#2d2218]">Subscribe to Our Newsletter</h3>
+          <p className="text-sm text-[#6b6358] mb-4">
             Get exclusive deals and fresh product updates delivered to your inbox.
           </p>
           <div className="flex gap-2">
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-4 py-2 rounded bg-primary-foreground text-primary placeholder-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary"
+              className="flex-1 px-4 py-2 rounded bg-white text-[#1a1410] border border-[#e8e4df] placeholder-[#6b6358]/60 text-sm focus:outline-none focus:ring-2 focus:ring-secondary"
             />
             <button className="px-6 py-2 bg-secondary text-secondary-foreground rounded font-medium text-sm hover:bg-secondary/90 transition-colors">
               Subscribe
@@ -158,7 +158,7 @@ export function HpFooter() {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-primary-foreground/20 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-primary-foreground/80">
+        <div className="border-t border-[#e8e4df] pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-[#6b6358]">
           <p>&copy; {currentYear} Fresh Direct Home. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <span className="hover:text-secondary transition-colors cursor-default">

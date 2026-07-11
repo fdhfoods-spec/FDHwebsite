@@ -98,13 +98,29 @@ export function ScheduledOrdersPanel() {
   const [newSlot, setNewSlot] = useState('10:00 AM - 01:00 PM')
 
   // Delivery Slots state
-  const [slotsList, setSlotsList] = useState<DeliverySlot[]>([
-    { id: 'SLOT-1', slotTime: '07:00 AM - 10:00 AM', maxCapacity: 20, currentBookings: 8, isActive: true },
-    { id: 'SLOT-2', slotTime: '10:00 AM - 01:00 PM', maxCapacity: 25, currentBookings: 14, isActive: true },
-    { id: 'SLOT-3', slotTime: '01:00 PM - 04:00 PM', maxCapacity: 20, currentBookings: 5, isActive: true },
-    { id: 'SLOT-4', slotTime: '04:00 PM - 07:00 PM', maxCapacity: 30, currentBookings: 19, isActive: true },
-    { id: 'SLOT-5', slotTime: '07:00 PM - 10:00 PM', maxCapacity: 15, currentBookings: 12, isActive: false }
-  ])
+  const [slotsList, setSlotsList] = useState<DeliverySlot[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('fdh_delivery_slots')
+      if (saved) {
+        try {
+          return JSON.parse(saved)
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    }
+    return [
+      { id: 'SLOT-1', slotTime: '07:00 AM - 10:00 AM', maxCapacity: 20, currentBookings: 8, isActive: true },
+      { id: 'SLOT-2', slotTime: '10:00 AM - 01:00 PM', maxCapacity: 25, currentBookings: 14, isActive: true },
+      { id: 'SLOT-3', slotTime: '01:00 PM - 04:00 PM', maxCapacity: 20, currentBookings: 5, isActive: true },
+      { id: 'SLOT-4', slotTime: '04:00 PM - 07:00 PM', maxCapacity: 30, currentBookings: 19, isActive: true },
+      { id: 'SLOT-5', slotTime: '07:00 PM - 10:00 PM', maxCapacity: 15, currentBookings: 12, isActive: false }
+    ]
+  })
+
+  useEffect(() => {
+    localStorage.setItem('fdh_delivery_slots', JSON.stringify(slotsList))
+  }, [slotsList])
 
   // System Audit & Timeline Logs
   const [orderTimelines, setOrderTimelines] = useState<Record<string, ActivityEvent[]>>({

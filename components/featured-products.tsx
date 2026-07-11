@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Star, ShoppingCart, Check, Info, Image as ImageIcon } from 'lucide-react'
+import { Star, ShoppingCart, Check, Info, Image as ImageIcon, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useStore } from '@/lib/store'
 
@@ -170,6 +170,13 @@ export function FeaturedProducts() {
                   <h3 className="font-sans font-bold text-base text-primary mb-1 group-hover:text-secondary transition-colors duration-200 leading-tight">
                     {product.name}
                   </h3>
+
+                  {product.availableSlots && product.availableSlots.length > 0 && (
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 rounded px-2 py-0.5 mt-1 self-start leading-tight">
+                      <Clock className="w-3 h-3 text-amber-500 shrink-0" />
+                      <span>Slots: {product.availableSlots.join(', ')}</span>
+                    </div>
+                  )}
                   
                   {/* Weight & Packaging details */}
                   <div className="flex items-center gap-1.5 mb-5 text-foreground/60 text-[11px] font-medium mt-1">
@@ -231,6 +238,7 @@ export function FeaturedProducts() {
                             weight: product.weight,
                             price: product.price,
                             image: product.image,
+                            availableSlots: product.availableSlots,
                           })
                           
                           // Programmatically click the cart button in the header
