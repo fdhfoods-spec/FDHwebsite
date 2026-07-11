@@ -752,46 +752,48 @@ export function ScheduledOrdersPanel() {
             <span className="text-xs font-bold text-slate-400">June / July 2026</span>
           </div>
 
-          <div className="grid grid-cols-7 gap-2 text-center">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d, i) => (
-              <div key={i} className="py-2 bg-slate-950/60 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-400 border border-slate-800/60">
-                {d}
-              </div>
-            ))}
-
-            {Array.from({ length: 28 }).map((_, i) => {
-              const dayNum = i + 1
-              const dayDateStr = `2026-06-${dayNum < 10 ? '0' + dayNum : dayNum}`
-              const dayOrders = scheduledOrders.filter(o => (o.scheduledDate || '').startsWith(dayDateStr))
-
-              return (
-                <div key={i} className="min-h-[100px] p-2 bg-slate-950/40 rounded-2xl border border-slate-800/60 flex flex-col justify-between hover:border-slate-700 transition-all">
-                  <div className="flex justify-between items-center text-xs font-mono font-bold text-slate-400">
-                    <span>{dayNum}</span>
-                    {dayOrders.length > 0 && (
-                      <span className="w-5 h-5 rounded-full bg-secondary text-white text-[9px] flex items-center justify-center font-black">
-                        {dayOrders.length}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="space-y-1 my-1 flex-1">
-                    {dayOrders.slice(0, 2).map(o => (
-                      <div
-                        key={o.id}
-                        onClick={() => setSelectedOrderDetails(o)}
-                        className="p-1 rounded bg-secondary/15 border border-secondary/30 text-[9px] text-white font-bold truncate cursor-pointer hover:bg-secondary/30 transition-colors text-left"
-                      >
-                        {o.customerName} ({o.items[0]?.name})
-                      </div>
-                    ))}
-                    {dayOrders.length > 2 && (
-                      <p className="text-[8px] text-slate-500 font-bold">+{dayOrders.length - 2} more</p>
-                    )}
-                  </div>
+          <div className="overflow-x-auto">
+            <div className="grid grid-cols-7 gap-2 text-center min-w-[700px]">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d, i) => (
+                <div key={i} className="py-2 bg-slate-950/60 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-400 border border-slate-800/60">
+                  {d}
                 </div>
-              )
-            })}
+              ))}
+
+              {Array.from({ length: 28 }).map((_, i) => {
+                const dayNum = i + 1
+                const dayDateStr = `2026-06-${dayNum < 10 ? '0' + dayNum : dayNum}`
+                const dayOrders = scheduledOrders.filter(o => (o.scheduledDate || '').startsWith(dayDateStr))
+
+                return (
+                  <div key={i} className="min-h-[100px] p-2 bg-slate-950/40 rounded-2xl border border-slate-800/60 flex flex-col justify-between hover:border-slate-700 transition-all">
+                    <div className="flex justify-between items-center text-xs font-mono font-bold text-slate-400">
+                      <span>{dayNum}</span>
+                      {dayOrders.length > 0 && (
+                        <span className="w-5 h-5 rounded-full bg-secondary text-white text-[9px] flex items-center justify-center font-black">
+                          {dayOrders.length}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-1 my-1 flex-1">
+                      {dayOrders.slice(0, 2).map(o => (
+                        <div
+                          key={o.id}
+                          onClick={() => setSelectedOrderDetails(o)}
+                          className="p-1 rounded bg-secondary/15 border border-secondary/30 text-[9px] text-white font-bold truncate cursor-pointer hover:bg-secondary/30 transition-colors text-left"
+                        >
+                          {o.customerName} ({o.items[0]?.name})
+                        </div>
+                      ))}
+                      {dayOrders.length > 2 && (
+                        <p className="text-[8px] text-slate-500 font-bold">+{dayOrders.length - 2} more</p>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
       )}

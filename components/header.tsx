@@ -90,6 +90,8 @@ export function Header() {
   const [pincodeFeedback, setPincodeFeedback] = useState('')
   const [pincodeFeedbackType, setPincodeFeedbackType] = useState<'success' | 'error' | ''>('')
   const [isPincodeModalOpen, setIsPincodeModalOpen] = useState(false)
+  // Track when user clicked "Sign In to Checkout" so we can auto-advance after login
+  const [pendingCheckout, setPendingCheckout] = useState(false)
 
   const handlePincodeSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -517,6 +519,17 @@ export function Header() {
     }
   }, [searchParams])
 
+  // Auto-advance to checkout after sign-in triggered from cart
+  useEffect(() => {
+    if (pendingCheckout && user) {
+      setPendingCheckout(false)
+      // Re-open cart and advance to checkout step
+      setIsCartOpen(true)
+      setCartStep('checkout')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingCheckout, user])
+
   // Filter districts across all states when searching inside the location selector
   const getFilteredLocations = () => {
     const query = locationSearchQuery.trim().toLowerCase()
@@ -928,7 +941,34 @@ export function Header() {
           <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
             {/* Pincode Input (Mobile) */}
             <div className="lg:hidden relative" ref={mobileLocationRef}>
-              <form onSubmit={handlePincodeSubmit} className="relative flex items-center">
+              {/* xs screens (< sm): compact narrow pincode form */}
+              <form onSubmit={handlePincodeSubmit} className="relative flex sm:hidden items-center">
+                <div className="relative">
+                  <MapPin className="w-3 h-3 text-secondary absolute left-2 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    placeholder="Pincode"
+                    value={pincode}
+                    onChange={(e) => {
+                      setPincode(e.target.value)
+                      setPincodeFeedback('')
+                      setPincodeFeedbackType('')
+                    }}
+                    className="pl-6 pr-9 py-1.5 border border-gray-200 focus:border-primary/45 focus:ring-1 focus:ring-primary/20 rounded-full bg-gray-50/50 hover:bg-gray-50 text-[10px] font-medium outline-none transition-all duration-200 w-24"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 text-[9px] font-bold text-primary hover:text-secondary px-1 py-0.5 bg-white border border-gray-200 rounded-full shadow-sm hover:shadow transition-all"
+                  >
+                    Go
+                  </button>
+                </div>
+              </form>
+
+              {/* sm to lg screens: full pincode input with Check button */}
+              <form onSubmit={handlePincodeSubmit} className="relative hidden sm:flex items-center">
                 <div className="relative">
                   <MapPin className="w-3.5 h-3.5 text-secondary absolute left-2.5 top-1/2 -translate-y-1/2" />
                   <input
@@ -952,10 +992,10 @@ export function Header() {
               </form>
             </div>
 
-            {/* Mobile Search Button */}
+            {/* Mobile Search Button — hidden on xs (bottom nav handles it), visible sm to md only */}
             <button
               onClick={() => setSearchFocused(true)}
-              className="p-2.5 hover:bg-primary/5 active:bg-primary/10 rounded-full transition-colors text-foreground/80 md:hidden"
+              className="hidden sm:flex md:hidden p-2.5 hover:bg-primary/5 active:bg-primary/10 rounded-full transition-colors text-foreground/80"
               aria-label="Search"
             >
               <Search className="w-5 h-5" />
@@ -963,13 +1003,13 @@ export function Header() {
 
 
 
-            {/* Cart Button */}
+            {/* Cart Button — hidden on xs (bottom nav handles it), visible sm+ */}
             <button
               onClick={() => {
                 setCartStep('cart')
                 setIsCartOpen(true)
               }}
-              className="relative p-2.5 hover:bg-primary/5 active:bg-primary/10 rounded-full transition-colors group"
+              className="relative hidden sm:flex p-2.5 hover:bg-primary/5 active:bg-primary/10 rounded-full transition-colors group"
             >
               <ShoppingCart className="w-5 h-5 text-foreground/80 group-hover:text-primary transition-colors" />
               {totalItems > 0 && (
@@ -1051,7 +1091,7 @@ export function Header() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 hover:bg-primary/5 active:bg-primary/10 rounded-full transition-colors text-foreground/80 focus:outline-none xl:hidden"
+              className="p-2 hover:bg-primary/5 active:bg-primary/10 rounded-full transition-colors text-foreground/80 focus:outline-none hidden sm:block xl:hidden"
               aria-label="Toggle Menu"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -1302,8 +1342,10 @@ export function Header() {
                       <Button
                         onClick={() => {
                           if (!user) {
-                            // Prompt login before checkout
-                            router.push('/auth?redirect=/?cart=open')
+                            // Close cart so AuthModal gets a clean full-screen overlay
+                            setPendingCheckout(true)
+                            setIsCartOpen(false)
+                            setAuthModalOpen(true)
                           } else {
                             setCartStep('checkout')
                           }
@@ -2138,6 +2180,87 @@ export function Header() {
         )}
       </AnimatePresence>
       <SearchOverlay />
+
+      {/* ── MOBILE BOTTOM NAVIGATION BAR ─────────────────────────────── */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-[0_-4px_24px_rgba(0,0,0,0.07)]">
+        <div className="flex items-center justify-around px-2 py-2 safe-area-pb">
+
+          {/* Home */}
+          <Link
+            href="/"
+            onClick={scrollToTop}
+            className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl hover:bg-primary/5 active:bg-primary/10 transition-colors group"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-foreground/60 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H5a1 1 0 01-1-1V9.75z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10" />
+            </svg>
+            <span className="text-[9px] font-bold text-foreground/50 group-hover:text-primary transition-colors tracking-wide">Home</span>
+          </Link>
+
+          {/* Search */}
+          <button
+            onClick={() => setSearchFocused(true)}
+            className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl hover:bg-primary/5 active:bg-primary/10 transition-colors group"
+            aria-label="Search"
+          >
+            <Search className="w-5 h-5 text-foreground/60 group-hover:text-primary transition-colors" />
+            <span className="text-[9px] font-bold text-foreground/50 group-hover:text-primary transition-colors tracking-wide">Search</span>
+          </button>
+
+          {/* Cart */}
+          <button
+            onClick={() => {
+              setCartStep('cart')
+              setIsCartOpen(true)
+            }}
+            className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl hover:bg-secondary/5 active:bg-secondary/10 transition-colors group relative"
+            aria-label="Cart"
+          >
+            <span className="relative">
+              <ShoppingCart className="w-5 h-5 text-foreground/60 group-hover:text-secondary transition-colors" />
+              {totalItems > 0 && (
+                <motion.span
+                  key={`mobile-cart-${totalItems}`}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-secondary text-white text-[8px] font-black rounded-full flex items-center justify-center border border-white shadow-sm"
+                >
+                  {totalItems}
+                </motion.span>
+              )}
+            </span>
+            <span className="text-[9px] font-bold text-foreground/50 group-hover:text-secondary transition-colors tracking-wide">Cart</span>
+          </button>
+
+          {/* Profile / Sign In */}
+          {user ? (
+            <Link
+              href="/profile"
+              className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl hover:bg-secondary/5 active:bg-secondary/10 transition-colors group"
+            >
+              <span className="w-6 h-6 rounded-full bg-secondary/15 border border-secondary/20 flex items-center justify-center group-hover:bg-secondary/25 transition-all">
+                {user.name && user.name !== 'Verified Customer' && user.name.trim() !== '' ? (
+                  <span className="text-secondary font-black text-[10px] uppercase">{user.name.trim().charAt(0)}</span>
+                ) : (
+                  <User className="w-3.5 h-3.5 text-secondary" />
+                )}
+              </span>
+              <span className="text-[9px] font-bold text-foreground/50 group-hover:text-secondary transition-colors tracking-wide">Account</span>
+            </Link>
+          ) : (
+            <button
+              onClick={() => setAuthModalOpen(true)}
+              className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl hover:bg-primary/5 active:bg-primary/10 transition-colors group"
+              aria-label="Sign In"
+            >
+              <User className="w-5 h-5 text-foreground/60 group-hover:text-primary transition-colors" />
+              <span className="text-[9px] font-bold text-foreground/50 group-hover:text-primary transition-colors tracking-wide">Sign In</span>
+            </button>
+          )}
+
+        </div>
+      </div>
     </>
   )
 }

@@ -314,7 +314,7 @@ export function AuthModal() {
                 <form onSubmit={handleVerifyOtpSubmit} className="space-y-5">
                   <div className="space-y-2">
                     <label className="text-[10px] font-extrabold uppercase tracking-wider text-foreground/50 block text-center">Enter 6-Digit SMS Code</label>
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-1.5 sm:gap-2">
                       {otpCode.map((digit, idx) => (
                         <input
                           key={idx}
@@ -324,7 +324,7 @@ export function AuthModal() {
                           value={digit}
                           onChange={(e) => handleOtpInputChange(idx, e.target.value)}
                           onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                          className="w-11 h-12 bg-gray-50 border border-gray-200 text-center text-lg font-black text-foreground font-mono rounded-xl outline-none focus:border-secondary transition-all"
+                          className="w-9 h-10 sm:w-11 sm:h-12 bg-gray-50 border border-gray-200 text-center text-base sm:text-lg font-black text-foreground font-mono rounded-xl outline-none focus:border-secondary transition-all"
                         />
                       ))}
                     </div>
